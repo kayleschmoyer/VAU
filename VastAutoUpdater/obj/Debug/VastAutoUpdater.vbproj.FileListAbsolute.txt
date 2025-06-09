@@ -119,3 +119,14 @@ C:\Users\schmoyek\source\repos\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAut
 C:\Users\schmoyek\source\repos\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.exe
 C:\Users\schmoyek\source\repos\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.xml
 C:\Users\schmoyek\source\repos\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.pdb
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.vbproj.AssemblyReference.cache
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.vbproj.SuggestedBindingRedirects.cache
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.exe.config
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.VASTUpdater.resources
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.Resources.resources
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.vbproj.GenerateResource.cache
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.vbproj.CoreCompileInputs.cache
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.exe
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.xml
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.pdb
+C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAuto.1C402AED.Up2Date

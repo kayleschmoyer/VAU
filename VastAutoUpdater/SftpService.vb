@@ -1,4 +1,6 @@
 Imports Renci.SshNet
+Imports System.IO
+Imports System.Linq
 
 Public Class SftpService
     Private ReadOnly host As String = ConfigManager.SftpHost

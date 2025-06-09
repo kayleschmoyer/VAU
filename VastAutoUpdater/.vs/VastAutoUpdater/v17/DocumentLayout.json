@@ -1,20 +1,25 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\schmoyek\\source\\repos\\VastAutoUpdater\\VastAutoUpdater\\",
+  "WorkspaceRootPath": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|c:\\users\\schmoyek\\source\\repos\\vastautoupdater\\vastautoupdater\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "AbsoluteMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|c:\\workprojects\\vastautoupdater\\vastautoupdater\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
       "RelativeMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|solutionrelative:form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|c:\\users\\schmoyek\\source\\repos\\vastautoupdater\\vastautoupdater\\form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form",
-      "RelativeMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|solutionrelative:form1.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}|Form"
+      "AbsoluteMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|c:\\workprojects\\vastautoupdater\\vastautoupdater\\updaterengine.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|solutionrelative:updaterengine.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|c:\\workprojects\\vastautoupdater\\vastautoupdater\\form1.designer.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|solutionrelative:form1.designer.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|c:\\workprojects\\vastautoupdater\\vastautoupdater\\sftpservice.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}",
+      "RelativeMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|solutionrelative:sftpservice.vb||{2C015C70-C72C-11D0-88C3-00A0C9110049}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{00000000-0000-0000-0000-000000000000}|\u003CSolution\u003E|VastAutoUpdater||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}|VastAutoUpdater.vbproj|c:\\users\\schmoyek\\source\\repos\\vastautoupdater\\vastautoupdater\\||{B270807C-D8C6-49EB-8EBE-8E8D566637A1}|8998e48e-b89a-4034-b66e-353d8c1fdc2e"
     }
   ],
   "DocumentGroupContainers": [
@@ -24,7 +29,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -36,40 +41,66 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "UpdaterEngine.vb",
+              "DocumentMoniker": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\UpdaterEngine.vb",
+              "RelativeDocumentMoniker": "UpdaterEngine.vb",
+              "ToolTip": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\UpdaterEngine.vb",
+              "RelativeToolTip": "UpdaterEngine.vb",
+              "ViewState": "AgIAADUAAAAAAAAAAAAnwD4AAABHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-06-09T18:41:22.311Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SftpService.vb",
+              "DocumentMoniker": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\SftpService.vb",
+              "RelativeDocumentMoniker": "SftpService.vb",
+              "ToolTip": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\SftpService.vb",
+              "RelativeToolTip": "SftpService.vb",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-06-09T18:40:37.995Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Form1.Designer.vb",
+              "DocumentMoniker": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\Form1.Designer.vb",
+              "RelativeDocumentMoniker": "Form1.Designer.vb",
+              "ToolTip": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\Form1.Designer.vb",
+              "RelativeToolTip": "Form1.Designer.vb",
+              "ViewState": "AgIAAC8AAAAAAAAAAAAYwDQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
+              "WhenOpened": "2025-06-09T18:39:13.801Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Form1.vb",
-              "DocumentMoniker": "C:\\Users\\schmoyek\\source\\repos\\VastAutoUpdater\\VastAutoUpdater\\Form1.vb",
+              "DocumentMoniker": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\Form1.vb",
               "RelativeDocumentMoniker": "Form1.vb",
-              "ToolTip": "C:\\Users\\schmoyek\\source\\repos\\VastAutoUpdater\\VastAutoUpdater\\Form1.vb",
+              "ToolTip": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\Form1.vb",
               "RelativeToolTip": "Form1.vb",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAIoAAAAAAAAAAAAYwJQAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
               "WhenOpened": "2025-06-09T18:09:26.493Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Form1.vb [Design]",
-              "DocumentMoniker": "C:\\Users\\schmoyek\\source\\repos\\VastAutoUpdater\\VastAutoUpdater\\Form1.vb",
-              "RelativeDocumentMoniker": "Form1.vb",
-              "ToolTip": "C:\\Users\\schmoyek\\source\\repos\\VastAutoUpdater\\VastAutoUpdater\\Form1.vb [Design]",
-              "RelativeToolTip": "Form1.vb [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003361|",
-              "WhenOpened": "2025-06-09T18:09:12.761Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "VastAutoUpdater",
-              "DocumentMoniker": "C:\\Users\\schmoyek\\source\\repos\\VastAutoUpdater\\VastAutoUpdater\\VastAutoUpdater.vbproj",
+              "DocumentMoniker": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\VastAutoUpdater.vbproj",
               "RelativeDocumentMoniker": "VastAutoUpdater.vbproj",
-              "ToolTip": "C:\\Users\\schmoyek\\source\\repos\\VastAutoUpdater\\VastAutoUpdater\\VastAutoUpdater.vbproj",
+              "ToolTip": "C:\\WorkProjects\\VastAutoUpdater\\VastAutoUpdater\\VastAutoUpdater.vbproj",
               "RelativeToolTip": "VastAutoUpdater.vbproj",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-06-09T18:07:27.821Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-06-09T18:07:27.821Z"
             }
           ]
         }

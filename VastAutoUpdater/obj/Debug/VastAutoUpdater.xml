@@ -22,11 +22,5 @@ VastAutoUpdater
   resource lookups using this strongly typed resource class.
 </summary>
 </member>
-<member name="M:VastAutoUpdater.VASTUpdater.SendNotification(System.Boolean,System.String)">
- <summary>
- Send notification email on success or failure,
- including store number/name and machine name.
- </summary>
-</member>
 </members>
 </doc>
