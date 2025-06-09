@@ -1,0 +1,5 @@
+C:\Users\schmoyek\source\repos\NewDownloadPatchandUpgrade\NewDownloadPatchandUpgrade\obj\Release\VastAutoUpdater.vbproj.AssemblyReference.cache
+C:\Users\schmoyek\source\repos\NewDownloadPatchandUpgrade\NewDownloadPatchandUpgrade\obj\Release\VastAutoUpdater.VASTUpdater.resources
+C:\Users\schmoyek\source\repos\NewDownloadPatchandUpgrade\NewDownloadPatchandUpgrade\obj\Release\VastAutoUpdater.Resources.resources
+C:\Users\schmoyek\source\repos\NewDownloadPatchandUpgrade\NewDownloadPatchandUpgrade\obj\Release\VastAutoUpdater.vbproj.GenerateResource.cache
+C:\Users\schmoyek\source\repos\NewDownloadPatchandUpgrade\NewDownloadPatchandUpgrade\obj\Release\VastAutoUpdater.vbproj.CoreCompileInputs.cache
