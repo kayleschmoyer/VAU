@@ -1,5 +1,8 @@
 Imports System.Diagnostics
 
+''' <summary>
+''' Simple wrapper around <see cref="EventLog"/> used throughout the application.
+''' </summary>
 Public Module Logger
     Private ReadOnly EVENT_SOURCE As String = "VASTUpdater"
     Private ReadOnly LOG_NAME As String = "Application"

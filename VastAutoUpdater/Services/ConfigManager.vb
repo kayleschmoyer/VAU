@@ -1,5 +1,8 @@
 Imports System.Configuration
 
+''' <summary>
+''' Centralized access to application configuration values from App.config.
+''' </summary>
 Public Module ConfigManager
     Public ReadOnly Property SftpHost As String
         Get
