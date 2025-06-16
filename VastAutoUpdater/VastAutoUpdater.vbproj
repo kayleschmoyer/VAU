@@ -310,6 +310,9 @@
     <Compile Include="Services/SftpService.vb" />
     <Compile Include="Services/EmailService.vb" />
     <Compile Include="Services/UpdaterEngine.vb" />
+    <Compile Include="Services/VersionService.vb" />
+    <Compile Include="Services/InstallerPathService.vb" />
+    <Compile Include="Services/ScheduledTaskService.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

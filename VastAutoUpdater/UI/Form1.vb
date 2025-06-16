@@ -29,9 +29,9 @@ Public Class VASTUpdater
 
     Private Sub VASTUpdater_Load(sender As Object, e As EventArgs)
         Try
-            Dim exePath = UpdaterEngine.FindVastExecutable()
+            Dim exePath = VersionService.FindVastExecutable()
             If Not String.IsNullOrEmpty(exePath) Then
-                Dim version = UpdaterEngine.GetFileVersion(exePath)
+                Dim version = VersionService.GetFileVersion(exePath)
                 lblCurrentVersion.Text = $"Current Version: {version}"
             Else
                 lblCurrentVersion.Text = "Current Version: Not Found"
