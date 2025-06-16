@@ -298,18 +298,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
-    <Compile Include="Form1.vb">
+    <Compile Include="UI/Form1.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.vb">
+    <Compile Include="UI/Form1.Designer.vb">
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Logger.vb" />
-    <Compile Include="ConfigManager.vb" />
-    <Compile Include="SftpService.vb" />
-    <Compile Include="EmailService.vb" />
-    <Compile Include="UpdaterEngine.vb" />
+    <Compile Include="Services/Logger.vb" />
+    <Compile Include="Services/ConfigManager.vb" />
+    <Compile Include="Services/SftpService.vb" />
+    <Compile Include="Services/EmailService.vb" />
+    <Compile Include="Services/UpdaterEngine.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -328,7 +328,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="UI/Form1.resx">
       <DependentUpon>Form1.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">

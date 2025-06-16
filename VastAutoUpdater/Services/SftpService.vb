@@ -1,3 +1,6 @@
+''' <summary>
+''' Handles communication with the remote SFTP server to check and download updates.
+''' </summary>
 Imports Renci.SshNet
 Imports System.IO
 Imports System.Linq
