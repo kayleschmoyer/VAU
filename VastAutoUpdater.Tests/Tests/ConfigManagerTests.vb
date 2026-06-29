@@ -13,8 +13,6 @@ Public Class ConfigManagerTests
 
     <TestMethod>
     Public Sub GetSetting_ExistingKey_ReturnsValue()
-        ' ConfigManager reads from ConfigurationManager.AppSettings.
-        ' We can test by adding a value at runtime.
         System.Configuration.ConfigurationManager.AppSettings.Set("TestKey_Unit", "TestValue123")
         Try
             Dim result As String = ConfigManager.GetSetting("TestKey_Unit", "fallback")
@@ -24,4 +22,6 @@ Public Class ConfigManagerTests
         End Try
     End Sub
 
-End Class
+    <TestMethod>
+    Public Sub GetSetting_EmptyValue_ReturnsDefault()
+        System.Configuration.ConfigurationManager.AppSetting

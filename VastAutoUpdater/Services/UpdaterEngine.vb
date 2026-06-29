@@ -28,7 +28,7 @@ Public Class UpdaterEngine
 
                 Dim vastPath As String = VersionService.FindVastExecutable()
                 If String.IsNullOrEmpty(vastPath) Then
-                    Throw New FileNotFoundException("VAST.exe not found on any drive")
+                    Throw New UpdateException(UpdateErrorCode.VastNotFound, "VAST.exe not found on any drive")
                 End If
 
                 Dim currentVersion As String = VersionService.GetFileVersion(vastPath)
@@ -36,7 +36,7 @@ Public Class UpdaterEngine
 
                 Dim parsedCurrent As Version = Nothing
                 If Not Version.TryParse(currentVersion, parsedCurrent) Then
-                    Throw New FormatException($"Cannot parse current version: {currentVersion}")
+                    Throw New UpdateException(UpdateErrorCode.VersionParseError, $"Cannot parse current version: {currentVersion}")
                 End If
                 Dim prefix As String = $"{parsedCurrent.Major}.{parsedCurrent.Minor}"
 
@@ -100,13 +100,13 @@ Public Class UpdaterEngine
                         End Sub))
 
                 If Not downloadOk Then
-                    Throw New IOException("Download failed — file is empty or missing")
+                    Throw New UpdateException(UpdateErrorCode.DownloadFailed, "Download failed — file is empty or missing")
                 End If
 
                 ' Verify downloaded file exists and has content
                 Dim installerInfo As New FileInfo(installer)
                 If Not installerInfo.Exists OrElse installerInfo.Length = 0 Then
-                    Throw New IOException("Downloaded installer is empty or missing")
+                    Throw New UpdateException(UpdateErrorCode.DownloadFailed, "Downloaded installer is empty or missing")
                 End If
 
                 cancelToken.ThrowIfCancellationRequested()
@@ -128,8 +128,7 @@ Public Class UpdaterEngine
                     If proc IsNot Nothing Then
                         Dim exited As Boolean = Await Task.Run(Function() proc.WaitForExit(10000))
                         If exited AndAlso proc.ExitCode <> 0 Then
-                            message = $"Installer exited with error code {proc.ExitCode}"
-                            Logger.Log(message, Logger.LogLevel.Error)
+                            Throw New UpdateException(UpdateErrorCode.InstallerFailed, $"Installer exited with error code {proc.ExitCode}")
                         ElseIf exited Then
                             success = True
                             message = $"Update {latest} downloaded and installer completed"
@@ -141,8 +140,7 @@ Public Class UpdaterEngine
                         End If
                     End If
                 Catch ex As Exception
-                    message = $"Failed to launch installer: {ex.Message}"
-                    Logger.Log(message, Logger.LogLevel.Error)
+                    Throw New UpdateException(UpdateErrorCode.InstallerFailed, $"Failed to launch installer: {ex.Message}", ex)
                 Finally
                     If proc IsNot Nothing Then proc.Dispose()
                 End Try
@@ -171,7 +169,10 @@ Public Class UpdaterEngine
 
         ' Re-throw so the caller can display the error
         If caughtEx IsNot Nothing Then
-            Throw New Exception(message, caughtEx)
+            If TypeOf caughtEx Is UpdateException Then
+                Throw caughtEx
+            End If
+            Throw New UpdateException(UpdateErrorCode.Unknown, message, caughtEx)
         End If
     End Function
 
@@ -210,7 +211,7 @@ Public Class UpdaterEngine
                     File.Delete(localPath)
                 Catch
                 End Try
-                Throw New InvalidDataException($"Installer hash mismatch! Expected: {expectedHash}, Got: {actualHash}")
+                Throw New UpdateException(UpdateErrorCode.HashMismatch, $"Installer hash mismatch! Expected: {expectedHash}, Got: {actualHash}")
             End If
 
             Logger.Log("Installer integrity verified via SHA-256", Logger.LogLevel.Info)
@@ -220,7 +221,7 @@ Public Class UpdaterEngine
                 File.Delete(hashPath)
             Catch
             End Try
-        Catch ex As InvalidDataException
+        Catch ex As UpdateException
             Throw ' Re-throw hash mismatch
         Catch ex As Exception
             Logger.Log($"Hash verification skipped: {ex.Message}", Logger.LogLevel.Warning)
@@ -239,7 +240,4 @@ Public Class UpdaterEngine
                 Return Await operation()
             Catch ex As Exception
                 lastEx = ex
-                Logger.Log($"Attempt {attempt}/{MAX_RETRIES} for {operationName} failed: {ex.Message}", Logger.LogLevel.Warning)
-                shouldDelay = (attempt < MAX_RETRIES)
-            End Try
-            ' Await cannot be inside Catch in VB.NET (.NE
+   

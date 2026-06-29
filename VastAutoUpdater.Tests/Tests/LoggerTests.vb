@@ -6,20 +6,30 @@ Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Public Class LoggerTests
 
     <TestMethod>
-    Public Sub Log_AllLogLevels_DoNotThrow()
-        ' Calling Log should not throw for any log level.
-        ' It may fail to write to Event Log (no admin rights in test) but should
-        ' fall back gracefully to file or Trace output.
+    Public Sub Log_InfoLevel_DoesNotThrow()
         Logger.Log("Unit test - Info level", Logger.LogLevel.Info)
+    End Sub
+
+    <TestMethod>
+    Public Sub Log_WarningLevel_DoesNotThrow()
         Logger.Log("Unit test - Warning level", Logger.LogLevel.Warning)
+    End Sub
+
+    <TestMethod>
+    Public Sub Log_ErrorLevel_DoesNotThrow()
         Logger.Log("Unit test - Error level", Logger.LogLevel.Error)
     End Sub
 
     <TestMethod>
-    Public Sub TrimLogFile_FileDoesNotExist_DoesNotThrow()
-        ' TrimLogFile should return silently when the log file does not exist.
-        ' It checks File.Exists internally and returns early.
-        Logger.TrimLogFile()
+    Public Sub Log_EmptyMessage_DoesNotThrow()
+        Logger.Log("", Logger.LogLevel.Info)
     End Sub
 
-End Class
+    <TestMethod>
+    Public Sub Log_LongMessage_DoesNotThrow()
+        Dim longMsg As New String("X"c, 10000)
+        Logger.Log(longMsg, Logger.LogLevel.Info)
+    End Sub
+
+    <TestMethod>
+ 

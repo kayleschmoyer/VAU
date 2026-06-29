@@ -15,9 +15,10 @@ Public Class VersionServiceTests
     Public Sub GetFileVersion_RealExecutable_ReturnsVersionString()
         Dim assemblyPath As String = System.Reflection.Assembly.GetExecutingAssembly().Location
         Dim result As String = VersionService.GetFileVersion(assemblyPath)
-        ' A real assembly should return some version string, not the fallback
         Assert.IsNotNull(result)
         Assert.AreNotEqual(String.Empty, result)
     End Sub
 
-End Class
+    <TestMethod>
+    Public Sub GetFileVersion_EmptyString_ReturnsZeroVersion()
+        

@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Extract version from tag
+      id: version
+      shell: bash
+      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet packages
+      run: nuget restore VastAutoUpdater.sln
+
+    - name: Build Release
+      run: msbuild VastAutoUpdater.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
+
+    - name: Run Tests
+      uses: microsoft/vstest-action@v1.0.0
+      with:
+        testAssembly: VastAutoUpdater.Tests\bin\Release\VastAutoUpdater.Tests.dll
+
+    - name: Prepare release artifacts
+      shell: pwsh
+      run: |
+        $outDir = "release-artifacts"
+        New-Item -ItemType Directory -Path $outDir -Force
+        Copy-Item "VastAutoUpdater\bin\Release\VastAutoUpdater.exe" "$outDir\"
+        Copy-Item "VastAutoUpdater\bin\Release\VastAutoUpdater.exe.config" "$outDir\"
+        Copy-Item "VastAutoUpdater\bin\Release\*.dll" "$outDir\"
+        # Generate SHA-256 hash for the executable
+        $hash = Get-FileHash "$outDir\VastAutoUpdater.exe" -Algorithm SHA256
+        "$($hash.Hash)  VastAutoUpdater.exe" | Out-File "$outDir\VastAutoUpdater.exe.sha256" -Encoding utf8
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: VAST Updater v${{ steps.version.outputs.VERSION }}
+        body: |
+          ## VAST Auto Updater v${{ steps.version.outputs.VERSION }}
+
+          ### Artifacts
+          - `VastAutoUpdater.exe` — Main updater executable
+          - `VastAutoUpdater.exe.sha256` — SHA-256 hash for integrity verification
+
+          ### Verification
+          ```powershell
+          (Get-FileHash VastAutoUpdater.exe -Algorithm SHA256).Hash
+          ```
+          Compare with the hash in `VastAutoUpdater.exe.sha256`.
+        files: |
+          release-artifacts/VastAutoUpdater.exe
+          release-artifacts/VastAutoUpdater.exe.config
+          release-artifacts/VastAutoUpdater.exe.sha256
+        draft: false
+        prerelease: false

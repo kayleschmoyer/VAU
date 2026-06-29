@@ -138,6 +138,7 @@ Partial Class MainForm
         '
         ' pnlCredentials
         '
+        Me.pnlCredentials.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.pnlCredentials.BackColor = System.Drawing.Color.White
         Me.pnlCredentials.Controls.Add(Me.lblUsername)
         Me.pnlCredentials.Controls.Add(Me.txtSftpUsername)
@@ -162,6 +163,7 @@ Partial Class MainForm
         '
         ' txtSftpUsername
         '
+        Me.txtSftpUsername.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.txtSftpUsername.BackColor = System.Drawing.Color.White
         Me.txtSftpUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtSftpUsername.Font = New System.Drawing.Font("Segoe UI", 11.0!)
@@ -184,6 +186,7 @@ Partial Class MainForm
         '
         ' txtSftpPassword
         '
+        Me.txtSftpPassword.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.txtSftpPassword.BackColor = System.Drawing.Color.White
         Me.txtSftpPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.txtSftpPassword.Font = New System.Drawing.Font("Segoe UI", 11.0!)
@@ -196,6 +199,7 @@ Partial Class MainForm
         '
         ' btnCheckForUpdates
         '
+        Me.btnCheckForUpdates.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.btnCheckForUpdates.BackColor = System.Drawing.Color.FromArgb(237, 1, 127)
         Me.btnCheckForUpdates.Cursor = System.Windows.Forms.Cursors.Hand
         Me.btnCheckForUpdates.FlatAppearance.BorderSize = 0
@@ -213,6 +217,7 @@ Partial Class MainForm
         '
         ' pnlProgress
         '
+        Me.pnlProgress.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.pnlProgress.BackColor = System.Drawing.Color.White
         Me.pnlProgress.Controls.Add(Me.progressBar1)
         Me.pnlProgress.Location = New System.Drawing.Point(24, 272)
@@ -233,6 +238,7 @@ Partial Class MainForm
         '
         ' lblStatus
         '
+        Me.lblStatus.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.lblStatus.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Regular)
         Me.lblStatus.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
         Me.lblStatus.Location = New System.Drawing.Point(24, 302)
@@ -243,6 +249,7 @@ Partial Class MainForm
         '
         ' lblCurrentVersion
         '
+        Me.lblCurrentVersion.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.lblCurrentVersion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular)
         Me.lblCurrentVersion.ForeColor = System.Drawing.Color.FromArgb(140, 140, 140)
         Me.lblCurrentVersion.Location = New System.Drawing.Point(24, 326)
@@ -253,37 +260,4 @@ Partial Class MainForm
         '
         ' pnlFooter — thin magenta accent bar at the bottom
         '
-        Me.pnlFooter.BackColor = System.Drawing.Color.FromArgb(237, 1, 127)
-        Me.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlFooter.Location = New System.Drawing.Point(0, 356)
-        Me.pnlFooter.Name = "pnlFooter"
-        Me.pnlFooter.Size = New System.Drawing.Size(520, 4)
-        Me.pnlFooter.TabIndex = 6
-        '
-        ' MainForm
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(520, 360)
-        Me.Controls.Add(Me.pnlFooter)
-        Me.Controls.Add(Me.lblCurrentVersion)
-        Me.Controls.Add(Me.lblStatus)
-        Me.Controls.Add(Me.pnlProgress)
-        Me.Controls.Add(Me.btnCheckForUpdates)
-        Me.Controls.Add(Me.pnlCredentials)
-        Me.Controls.Add(Me.pnlHeader)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
-        Me.MaximizeBox = False
-        Me.Name = "MainForm"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "VAST Updater"
-        Me.pnlHeader.ResumeLayout(False)
-        Me.pnlHeader.PerformLayout()
-        Me.pnlCredentials.ResumeLayout(False)
-        Me.pnlCredentials.PerformLayout()
-        Me.pnlProgress.ResumeLayout(False)
-        Me.ResumeLayout(False)
-    End Sub
-
-End Class
+        Me.pnlFooter.
