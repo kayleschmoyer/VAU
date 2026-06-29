@@ -75,18 +75,18 @@ Partial Class MainForm
         Me.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top
         Me.pnlHeader.Location = New System.Drawing.Point(0, 0)
         Me.pnlHeader.Name = "pnlHeader"
-        Me.pnlHeader.Size = New System.Drawing.Size(520, 90)
+        Me.pnlHeader.Size = New System.Drawing.Size(520, 55)
         Me.pnlHeader.TabIndex = 0
         '
         ' lblTitle
         '
         Me.lblTitle.AutoSize = True
         Me.lblTitle.BackColor = System.Drawing.Color.Transparent
-        Me.lblTitle.Font = New System.Drawing.Font("Inter", 18.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
+        Me.lblTitle.Font = New System.Drawing.Font("Inter", 14.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
         Me.lblTitle.ForeColor = System.Drawing.Color.White
-        Me.lblTitle.Location = New System.Drawing.Point(24, 18)
+        Me.lblTitle.Location = New System.Drawing.Point(16, 8)
         Me.lblTitle.Name = "lblTitle"
-        Me.lblTitle.Size = New System.Drawing.Size(200, 30)
+        Me.lblTitle.Size = New System.Drawing.Size(200, 24)
         Me.lblTitle.TabIndex = 0
         Me.lblTitle.Text = "VAST Updater"
         '
@@ -96,7 +96,7 @@ Partial Class MainForm
         Me.lblSubtitle.BackColor = System.Drawing.Color.Transparent
         Me.lblSubtitle.Font = New System.Drawing.Font("Inter", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.lblSubtitle.ForeColor = System.Drawing.Color.FromArgb(255, 200, 230)
-        Me.lblSubtitle.Location = New System.Drawing.Point(26, 54)
+        Me.lblSubtitle.Location = New System.Drawing.Point(18, 32)
         Me.lblSubtitle.Name = "lblSubtitle"
         Me.lblSubtitle.Size = New System.Drawing.Size(180, 16)
         Me.lblSubtitle.TabIndex = 1
@@ -138,12 +138,12 @@ Partial Class MainForm
         '
         ' pnlCredentials
         '
-        Me.pnlCredentials.BackColor = System.Drawing.Color.FromArgb(242, 243, 239)
+        Me.pnlCredentials.BackColor = System.Drawing.Color.White
         Me.pnlCredentials.Controls.Add(Me.lblUsername)
         Me.pnlCredentials.Controls.Add(Me.txtSftpUsername)
         Me.pnlCredentials.Controls.Add(Me.lblPassword)
         Me.pnlCredentials.Controls.Add(Me.txtSftpPassword)
-        Me.pnlCredentials.Location = New System.Drawing.Point(24, 106)
+        Me.pnlCredentials.Location = New System.Drawing.Point(24, 70)
         Me.pnlCredentials.Name = "pnlCredentials"
         Me.pnlCredentials.Padding = New System.Windows.Forms.Padding(16, 12, 16, 12)
         Me.pnlCredentials.Size = New System.Drawing.Size(472, 130)
@@ -204,7 +204,7 @@ Partial Class MainForm
         Me.btnCheckForUpdates.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnCheckForUpdates.Font = New System.Drawing.Font("Inter", 11.0!, System.Drawing.FontStyle.Bold)
         Me.btnCheckForUpdates.ForeColor = System.Drawing.Color.White
-        Me.btnCheckForUpdates.Location = New System.Drawing.Point(24, 250)
+        Me.btnCheckForUpdates.Location = New System.Drawing.Point(24, 214)
         Me.btnCheckForUpdates.Name = "btnCheckForUpdates"
         Me.btnCheckForUpdates.Size = New System.Drawing.Size(472, 44)
         Me.btnCheckForUpdates.TabIndex = 2
@@ -213,9 +213,9 @@ Partial Class MainForm
         '
         ' pnlProgress
         '
-        Me.pnlProgress.BackColor = System.Drawing.Color.FromArgb(242, 243, 239)
+        Me.pnlProgress.BackColor = System.Drawing.Color.White
         Me.pnlProgress.Controls.Add(Me.progressBar1)
-        Me.pnlProgress.Location = New System.Drawing.Point(24, 308)
+        Me.pnlProgress.Location = New System.Drawing.Point(24, 272)
         Me.pnlProgress.Name = "pnlProgress"
         Me.pnlProgress.Padding = New System.Windows.Forms.Padding(0, 6, 0, 6)
         Me.pnlProgress.Size = New System.Drawing.Size(472, 20)
@@ -235,7 +235,7 @@ Partial Class MainForm
         '
         Me.lblStatus.Font = New System.Drawing.Font("Inter", 9.5!, System.Drawing.FontStyle.Regular)
         Me.lblStatus.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
-        Me.lblStatus.Location = New System.Drawing.Point(24, 338)
+        Me.lblStatus.Location = New System.Drawing.Point(24, 302)
         Me.lblStatus.Name = "lblStatus"
         Me.lblStatus.Size = New System.Drawing.Size(472, 20)
         Me.lblStatus.TabIndex = 4
@@ -245,7 +245,7 @@ Partial Class MainForm
         '
         Me.lblCurrentVersion.Font = New System.Drawing.Font("Inter", 9.0!, System.Drawing.FontStyle.Regular)
         Me.lblCurrentVersion.ForeColor = System.Drawing.Color.FromArgb(140, 140, 140)
-        Me.lblCurrentVersion.Location = New System.Drawing.Point(24, 362)
+        Me.lblCurrentVersion.Location = New System.Drawing.Point(24, 326)
         Me.lblCurrentVersion.Name = "lblCurrentVersion"
         Me.lblCurrentVersion.Size = New System.Drawing.Size(472, 18)
         Me.lblCurrentVersion.TabIndex = 5
@@ -255,7 +255,7 @@ Partial Class MainForm
         '
         Me.pnlFooter.BackColor = System.Drawing.Color.FromArgb(237, 1, 127)
         Me.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlFooter.Location = New System.Drawing.Point(0, 396)
+        Me.pnlFooter.Location = New System.Drawing.Point(0, 356)
         Me.pnlFooter.Name = "pnlFooter"
         Me.pnlFooter.Size = New System.Drawing.Size(520, 4)
         Me.pnlFooter.TabIndex = 6
@@ -265,7 +265,7 @@ Partial Class MainForm
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(520, 400)
+        Me.ClientSize = New System.Drawing.Size(520, 360)
         Me.Controls.Add(Me.pnlFooter)
         Me.Controls.Add(Me.lblCurrentVersion)
         Me.Controls.Add(Me.lblStatus)

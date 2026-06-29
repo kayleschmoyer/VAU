@@ -54,8 +54,7 @@ Public Class MainForm
         AddHandler btnClose.Click, AddressOf BtnClose_Click
         AddHandler btnMinimize.Click, AddressOf BtnMinimize_Click
 
-        ' Rounded credential panel
-        AddHandler pnlCredentials.Paint, AddressOf PaintRoundedPanel
+        ' Credential panel no longer needs custom paint
 
         ' Custom progress bar color
         SetProgressBarColor()
@@ -74,16 +73,6 @@ Public Class MainForm
             MagentaDark,
             LinearGradientMode.Horizontal)
             e.Graphics.FillRectangle(brush, pnl.ClientRectangle)
-        End Using
-
-        ' Subtle grid pattern overlay
-        Using pen As New Pen(Color.FromArgb(30, 255, 255, 255), 1)
-            For x As Integer = 0 To pnl.Width Step 40
-                e.Graphics.DrawLine(pen, x, 0, x, pnl.Height)
-            Next
-            For y As Integer = 0 To pnl.Height Step 40
-                e.Graphics.DrawLine(pen, 0, y, pnl.Width, y)
-            Next
         End Using
     End Sub
 

@@ -147,6 +147,11 @@ Public Class UpdaterEngine
         Catch emailEx As Exception
             Logger.Log($"Failed to send summary email: {emailEx.Message}", Logger.LogLevel.Warning)
         End Try
+
+        ' Re-throw so the caller can display the error
+        If caughtEx IsNot Nothing Then
+            Throw New Exception(message, caughtEx)
+        End If
     End Function
 
     ''' <summary>
