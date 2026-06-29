@@ -66,12 +66,11 @@
     <Compile Include="Tests\LoggerTests.vb" />
     <Compile Include="Tests\UpdateExceptionTests.vb" />
     <Compile Include="Tests\UpdaterEngineTests.vb" />
+    <Compile Include="Tests\EmailServiceTests.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VastAutoUpdater\VastAutoUpdater.vbproj">
       <Project>{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}</Project>
       <Name>VastAutoUpdater</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.
+  </

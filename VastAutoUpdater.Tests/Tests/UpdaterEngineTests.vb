@@ -155,4 +155,4 @@ Public Class UpdaterEngineTests
         Assert.IsNotNull(engine)
     End Sub
 
-End Class
+    <TestM
