@@ -69,6 +69,11 @@ VastAutoUpdater
  Safely retrieve a string setting with a default fallback.
  </summary>
 </member>
+<member name="M:VastAutoUpdater.ConfigManager.SaveSetting(System.String,System.String)">
+ <summary>
+ Save a setting value to App.config.
+ </summary>
+</member>
 <member name="M:VastAutoUpdater.ConfigManager.GetSettingInt(System.String,System.Int32)">
  <summary>
  Safely retrieve an integer setting with a default fallback.
@@ -88,21 +93,48 @@ VastAutoUpdater
  Returns the "enc:" prefixed base64 string suitable for App.config.
  </summary>
 </member>
-<member name="M:VastAutoUpdater.SftpService.CreateClient(System.String,System.String)">
+<member name="M:VastAutoUpdater.ConfigManager.EncryptOnFirstRun">
  <summary>
- Create a configured SftpClient with proper timeouts.
+ On first run, encrypt any plaintext credential values in App.config using DPAPI.
+ Already-encrypted values (prefixed with "enc:") are left unchanged.
  </summary>
 </member>
-<member name="M:VastAutoUpdater.SftpService.GetLatestVersion(System.String,System.String,System.String)">
+<member name="M:VastAutoUpdater.SftpService.Connect(System.String,System.String)">
+ <summary>
+ Connect to the SFTP server with host key verification.
+ Reuses the existing connection if already connected.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.SftpService.ValidateHostKey(System.Object,Renci.SshNet.Common.HostKeyEventArgs)">
+ <summary>
+ Validate the SSH host key fingerprint.
+ On first connection, the fingerprint is stored in App.config.
+ On subsequent connections, it must match the stored value.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.SftpService.Disconnect">
+ <summary>
+ Disconnect from the server cleanly.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.SftpService.GetLatestVersion(System.String)">
  <summary>
  Query the SFTP server for the latest version matching the given major.minor prefix.
- Returns "0.0.0" if no matching version is found or on error.
+ Returns "0.0.0" if no matching version is found.
+ Must call Connect() first.
  </summary>
 </member>
-<member name="M:VastAutoUpdater.SftpService.DownloadFile(System.String,System.String,System.String,System.String,System.Action{System.UInt64})">
+<member name="M:VastAutoUpdater.SftpService.GetRemoteFileSize(System.String)">
+ <summary>
+ Get the size of a remote file in bytes.
+ Returns 0 if the file doesn't exist.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.SftpService.DownloadFile(System.String,System.String,System.Action{System.UInt64})">
  <summary>
  Download the installer for the specified version to localPath.
  Returns True on success, False on failure.
+ Must call Connect() first.
  </summary>
 </member>
 <member name="T:VastAutoUpdater.EmailService">
@@ -122,9 +154,16 @@ VastAutoUpdater
  Perform the update workflow with retry logic and send a summary email.
  </summary>
 </member>
-<member name="M:VastAutoUpdater.UpdaterEngine.RetryOperation``1(System.Func{``0},System.String)">
+<member name="M:VastAutoUpdater.UpdaterEngine.VerifyInstallerHash(VastAutoUpdater.SftpService,System.String,System.String)">
  <summary>
- Retry an operation up to MAX_RETRIES times with delay between attempts.
+ Verify installer integrity using a SHA-256 hash sidecar file (.sha256).
+ If no sidecar exists on the server, logs a warning and continues.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.UpdaterEngine.RetryOperationAsync``1(System.Func{System.Threading.Tasks.Task{``0}},System.String)">
+ <summary>
+ Retry an async operation up to MAX_RETRIES times with Task.Delay between attempts.
+ Does not block thread pool threads.
  </summary>
 </member>
 <member name="T:VastAutoUpdater.VersionService">
@@ -164,23 +203,6 @@ VastAutoUpdater
  <summary>
  Remove old installer files, keeping only the current version.
  Prevents ProgramData from accumulating stale installers.
- </summary>
-</member>
-<member name="T:VastAutoUpdater.ScheduledTaskService">
- <summary>
- Encapsulates creation of Windows scheduled tasks for running the updater.
- Uses schtasks.exe directly (not via cmd.exe) to avoid command injection.
- </summary>
-</member>
-<member name="M:VastAutoUpdater.ScheduledTaskService.CreateTask">
- <summary>
- Create a weekly scheduled task that runs the updater silently.
- Calls schtasks.exe directly with proper argument quoting.
- </summary>
-</member>
-<member name="M:VastAutoUpdater.ScheduledTaskService.TaskExists">
- <summary>
- Check if the scheduled task already exists.
  </summary>
 </member>
 </members>

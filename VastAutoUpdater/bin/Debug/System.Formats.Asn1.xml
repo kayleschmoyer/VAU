@@ -6,23 +6,23 @@
     <members>
         <member name="T:System.Formats.Asn1.Asn1Tag">
             <summary>
-              This type represents an ASN.1 tag, as described in ITU-T Recommendation X.680.
+              Represents an ASN.1 tag, as described in ITU-T Recommendation X.680.
             </summary>
         </member>
         <member name="P:System.Formats.Asn1.Asn1Tag.TagClass">
             <summary>
-              The tag class to which this tag belongs.
+              Gets the tag class to which this tag belongs.
             </summary>
         </member>
         <member name="P:System.Formats.Asn1.Asn1Tag.IsConstructed">
             <summary>
-              Indicates if the tag represents a constructed encoding (<see langword="true"/>), or
+              Gets a value that indicates whether the tag represents a constructed encoding (<see langword="true"/>), or
               a primitive encoding (<see langword="false"/>).
             </summary>
         </member>
         <member name="P:System.Formats.Asn1.Asn1Tag.TagValue">
             <summary>
-              The numeric value for this tag.
+              Gets the numeric value for this tag.
             </summary>
             <remarks>
               If <see cref="P:System.Formats.Asn1.Asn1Tag.TagClass"/> is <see cref="F:System.Formats.Asn1.TagClass.Universal"/>, this value can
@@ -31,7 +31,7 @@
         </member>
         <member name="M:System.Formats.Asn1.Asn1Tag.#ctor(System.Formats.Asn1.UniversalTagNumber,System.Boolean)">
             <summary>
-              Create an <see cref="T:System.Formats.Asn1.Asn1Tag"/> for a tag from the UNIVERSAL class.
+              Creates an <see cref="T:System.Formats.Asn1.Asn1Tag"/> for a tag from the UNIVERSAL class.
             </summary>
             <param name="universalTagNumber">
               One of the enumeration values that specifies the semantic type for this tag.
@@ -45,7 +45,7 @@
         </member>
         <member name="M:System.Formats.Asn1.Asn1Tag.#ctor(System.Formats.Asn1.TagClass,System.Int32,System.Boolean)">
              <summary>
-               Create an <see cref="T:System.Formats.Asn1.Asn1Tag"/> for a specified value within a specified tag class.
+               Creates an <see cref="T:System.Formats.Asn1.Asn1Tag"/> for a specified value within a specified tag class.
              </summary>
              <param name="tagClass">
                The tag class for this tag.
@@ -64,7 +64,7 @@
                <paramref name="tagValue" /> is negative.
              </exception>
              <remarks>
-               This constructor allows for the creation undefined UNIVERSAL class tags.
+               This constructor allows for the creation of undefined UNIVERSAL class tags.
              </remarks>
         </member>
         <member name="M:System.Formats.Asn1.Asn1Tag.AsConstructed">
@@ -89,10 +89,10 @@
         </member>
         <member name="M:System.Formats.Asn1.Asn1Tag.TryDecode(System.ReadOnlySpan{System.Byte},System.Formats.Asn1.Asn1Tag@,System.Int32@)">
             <summary>
-              Attempts to read a BER-encoded tag which starts at <paramref name="source"/>.
+              Attempts to read a BER-encoded tag that starts at <paramref name="source"/>.
             </summary>
             <param name="source">
-              The read only byte sequence whose beginning is a BER-encoded tag.
+              The read-only byte sequence whose beginning is a BER-encoded tag.
             </param>
             <param name="tag">
               The decoded tag.
@@ -107,10 +107,10 @@
         </member>
         <member name="M:System.Formats.Asn1.Asn1Tag.Decode(System.ReadOnlySpan{System.Byte},System.Int32@)">
             <summary>
-              Reads a BER-encoded tag which starts at <paramref name="source"/>.
+              Reads a BER-encoded tag that starts at <paramref name="source"/>.
             </summary>
             <param name="source">
-              The read only byte sequence whose beginning is a BER-encoded tag.
+              The read-only byte sequence whose beginning is a BER-encoded tag.
             </param>
             <param name="bytesConsumed">
               When this method returns, contains the number of bytes that contributed
@@ -167,7 +167,7 @@
               Tests if <paramref name="other"/> has the same encoding as this tag.
             </summary>
             <param name="other">
-              Tag to test for equality.
+              The tag to test for equality.
             </param>
             <returns>
               <see langword="true"/> if <paramref name="other"/> has the same values for
@@ -180,7 +180,7 @@
               Tests if <paramref name="obj"/> is an <see cref="T:System.Formats.Asn1.Asn1Tag"/> with the same
               encoding as this tag.
             </summary>
-            <param name="obj">Object to test for value equality</param>
+            <param name="obj">The object to test for value equality.</param>
             <returns>
               <see langword="false"/> if <paramref name="obj"/> is not an <see cref="T:System.Formats.Asn1.Asn1Tag"/>,
               <see cref="M:System.Formats.Asn1.Asn1Tag.Equals(System.Formats.Asn1.Asn1Tag)"/> otherwise.
@@ -359,7 +359,7 @@
         </member>
         <member name="T:System.Formats.Asn1.AsnEncodingRules">
             <summary>
-              The encoding ruleset for an <see cref="T:System.Formats.Asn1.AsnReader"/> or <see cref="T:System.Formats.Asn1.AsnWriter"/>.
+              Specifies the encoding ruleset for an <see cref="T:System.Formats.Asn1.AsnReader"/> or <see cref="T:System.Formats.Asn1.AsnWriter"/>.
             </summary>
         </member>
         <member name="F:System.Formats.Asn1.AsnEncodingRules.BER">
@@ -384,26 +384,26 @@
         </member>
         <member name="M:System.Formats.Asn1.AsnDecoder.TryReadEncodedValue(System.ReadOnlySpan{System.Byte},System.Formats.Asn1.AsnEncodingRules,System.Formats.Asn1.Asn1Tag@,System.Int32@,System.Int32@,System.Int32@)">
             <summary>
-              Attempts locate the contents range for the encoded value at the beginning of the
+              Attempts to locate the contents range for the encoded value at the beginning of the
               <paramref name="source"/> buffer using the specified encoding rules.
             </summary>
             <param name="source">The buffer containing encoded data.</param>
             <param name="ruleSet">The encoding constraints to use when interpreting the data.</param>
             <param name="tag">
-              When this method returns, the tag identifying the content.
+              When this method returns, contains the tag identifying the content.
               This parameter is treated as uninitialized.
             </param>
             <param name="contentOffset">
-              When this method returns, the offset of the content payload relative to the start of
+              When this method returns, contains the offset of the content payload relative to the start of
               <paramref name="source"/>.
               This parameter is treated as uninitialized.
             </param>
             <param name="contentLength">
-              When this method returns, the number of bytes in the content payload (which may be 0).
+              When this method returns, contains the number of bytes in the content payload (which may be 0).
               This parameter is treated as uninitialized.
             </param>
             <param name="bytesConsumed">
-              When this method returns, the total number of bytes for the encoded value.
+              When this method returns, contains the total number of bytes for the encoded value.
               This parameter is treated as uninitialized.
             </param>
             <returns>
@@ -435,16 +435,16 @@
             <param name="source">The buffer containing encoded data.</param>
             <param name="ruleSet">The encoding constraints to use when interpreting the data.</param>
             <param name="contentOffset">
-              When this method returns, the offset of the content payload relative to the start of
+              When this method returns, contains the offset of the content payload relative to the start of
               <paramref name="source"/>.
               This parameter is treated as uninitialized.
             </param>
             <param name="contentLength">
-              When this method returns, the number of bytes in the content payload (which may be 0).
+              When this method returns, contains the number of bytes in the content payload (which may be 0).
               This parameter is treated as uninitialized.
             </param>
             <param name="bytesConsumed">
-              When this method returns, the total number of bytes for the encoded value.
+              When this method returns, contains the total number of bytes for the encoded value.
               This parameter is treated as uninitialized.
             </param>
             <returns>
@@ -530,7 +530,7 @@
         <member name="M:System.Formats.Asn1.AsnDecoder.SeekEndOfContents(System.ReadOnlySpan{System.Byte},System.Formats.Asn1.AsnEncodingRules)">
             <summary>
             Get the number of bytes between the start of <paramref name="source" /> and
-            the End-of-Contents marker
+            the End-of-Contents marker.
             </summary>
         </member>
         <member name="M:System.Formats.Asn1.AsnDecoder.TryReadPrimitiveBitString(System.ReadOnlySpan{System.Byte},System.Formats.Asn1.AsnEncodingRules,System.Int32@,System.ReadOnlySpan{System.Byte}@,System.Int32@,System.Nullable{System.Formats.Asn1.Asn1Tag})">
@@ -1946,7 +1946,7 @@
         </member>
         <member name="T:System.Formats.Asn1.AsnReader">
             <summary>
-              A stateful, forward-only reader for BER-, CER-, or DER-encoded ASN.1 data.
+              Represents a stateful, forward-only reader for BER-encoded, CER-encoded, or DER-encoded ASN.1 data.
             </summary>
         </member>
         <member name="P:System.Formats.Asn1.AsnReader.RuleSet">
@@ -1959,7 +1959,7 @@
         </member>
         <member name="P:System.Formats.Asn1.AsnReader.HasData">
             <summary>
-              Gets an indication of whether the reader has remaining data available to process.
+              Gets a value that indicates whether the reader has remaining data available to process.
             </summary>
             <value>
               <see langword="true"/> if there is more data available for the reader to process;
@@ -1987,7 +1987,7 @@
         <member name="M:System.Formats.Asn1.AsnReader.ThrowIfNotEmpty">
             <summary>
               Throws a standardized <see cref="T:System.Formats.Asn1.AsnContentException"/> if the reader has remaining
-              data, performs no function if <see cref="P:System.Formats.Asn1.AsnReader.HasData"/> returns <see langword="false"/>.
+              data, or performs no function if <see cref="P:System.Formats.Asn1.AsnReader.HasData"/> returns <see langword="false"/>.
             </summary>
             <remarks>
               This method provides a standardized target and standardized exception for reading a
@@ -1996,19 +1996,19 @@
         </member>
         <member name="M:System.Formats.Asn1.AsnReader.PeekTag">
             <summary>
-              Read the encoded tag at the next data position, without advancing the reader.
+              Reads the encoded tag at the next data position, without advancing the reader.
             </summary>
             <returns>
               The decoded tag value.
             </returns>
             <exception cref="T:System.Formats.Asn1.AsnContentException">
-              a tag could not be decoded at the reader's current position.
+              A tag could not be decoded at the reader's current position.
             </exception>
         </member>
         <member name="M:System.Formats.Asn1.AsnReader.PeekEncodedValue">
             <summary>
-              Get a <see cref="T:System.ReadOnlyMemory`1"/> view of the next encoded value without
-              advancing the reader. For indefinite length encodings this includes the
+              Gets a <see cref="T:System.ReadOnlyMemory`1"/> view of the next encoded value without
+              advancing the reader. For indefinite length encodings, this includes the
               End of Contents marker.
             </summary>
             <returns>
@@ -2023,7 +2023,7 @@
         </member>
         <member name="M:System.Formats.Asn1.AsnReader.PeekContentBytes">
             <summary>
-              Get a <see cref="T:System.ReadOnlyMemory`1"/> view of the content octets (bytes) of the
+              Gets a <see cref="T:System.ReadOnlyMemory`1"/> view of the content octets (bytes) of the
               next encoded value without advancing the reader.
             </summary>
             <returns>
@@ -2038,7 +2038,7 @@
         <member name="M:System.Formats.Asn1.AsnReader.ReadEncodedValue">
             <summary>
               Get a <see cref="T:System.ReadOnlyMemory`1"/> view of the next encoded value,
-              and advance the reader past it. For an indefinite length encoding this includes
+              and advance the reader past it. For an indefinite length encoding, this includes
               the End of Contents marker.
             </summary>
             <returns>
@@ -3217,7 +3217,7 @@
         </member>
         <member name="T:System.Formats.Asn1.AsnWriter">
             <summary>
-              A writer for BER-, CER-, and DER-encoded ASN.1 data.
+              A writer for BER-encoded, CER-encoded, and DER-encoded ASN.1 data.
             </summary>
         </member>
         <member name="P:System.Formats.Asn1.AsnWriter.RuleSet">
@@ -3230,7 +3230,7 @@
         </member>
         <member name="M:System.Formats.Asn1.AsnWriter.#ctor(System.Formats.Asn1.AsnEncodingRules)">
             <summary>
-              Create a new <see cref="T:System.Formats.Asn1.AsnWriter"/> with a given set of encoding rules.
+              Creates a new <see cref="T:System.Formats.Asn1.AsnWriter"/> with a given set of encoding rules.
             </summary>
             <param name="ruleSet">The encoding constraints for the writer.</param>
             <exception cref="T:System.ArgumentOutOfRangeException">
@@ -3255,7 +3255,7 @@
         </member>
         <member name="M:System.Formats.Asn1.AsnWriter.Reset">
             <summary>
-              Reset the writer to have no data, without releasing resources.
+              Resets the writer to have no data, without releasing resources.
             </summary>
         </member>
         <member name="M:System.Formats.Asn1.AsnWriter.GetEncodedLength">
@@ -3277,7 +3277,7 @@
             </summary>
             <param name="destination">The buffer in which to write.</param>
             <param name="bytesWritten">
-              On success, receives the number of bytes written to <paramref name="destination"/>.
+              When this method returns, contains the number of bytes written to <paramref name="destination"/>.
             </param>
             <returns>
               <see langword="true"/> if the encode succeeded,
@@ -3303,7 +3303,7 @@
         </member>
         <member name="M:System.Formats.Asn1.AsnWriter.Encode">
             <summary>
-              Return a new array containing the encoded value.
+              Returns a new array containing the encoded value.
             </summary>
             <returns>
               A precisely-sized array containing the encoded value.
@@ -3346,7 +3346,7 @@
         </member>
         <member name="M:System.Formats.Asn1.AsnWriter.CopyTo(System.Formats.Asn1.AsnWriter)">
              <summary>
-               Copy the value of this writer into another.
+               Copies the value of this writer into another.
              </summary>
              <param name="destination">The writer to receive the value.</param>
              <exception cref="T:System.ArgumentNullException">
@@ -3372,7 +3372,7 @@
         </member>
         <member name="M:System.Formats.Asn1.AsnWriter.WriteEncodedValue(System.ReadOnlySpan{System.Byte})">
              <summary>
-               Write a single value which has already been encoded.
+               Writes a single value that has already been encoded.
              </summary>
              <param name="value">The value to write.</param>
              <remarks>
@@ -3395,7 +3395,7 @@
             <remarks>
               Instances of this type are expected to be created from a <c>Push</c> member on <see cref="T:System.Formats.Asn1.AsnWriter"/>,
               not instantiated directly.
-              Calling <see cref="M:System.Formats.Asn1.AsnWriter.Scope.Dispose" /> will call the corresponding <c>Pop</c> associated with the <c>Push</c>.
+              Calling <see cref="M:System.Formats.Asn1.AsnWriter.Scope.Dispose" /> calls the corresponding <c>Pop</c> associated with the <c>Push</c>.
             </remarks>
         </member>
         <member name="M:System.Formats.Asn1.AsnWriter.Scope.Dispose">
@@ -3944,7 +3944,7 @@
         </member>
         <member name="T:System.Formats.Asn1.TagClass">
             <summary>
-              The tag class for a particular ASN.1 tag.
+              Specifies the tag class for a particular ASN.1 tag.
             </summary>
         </member>
         <member name="F:System.Formats.Asn1.TagClass.Universal">
@@ -3969,7 +3969,7 @@
         </member>
         <member name="T:System.Formats.Asn1.UniversalTagNumber">
             <summary>
-              Tag assignments for the UNIVERSAL class in ITU-T X.680.
+              Specifies tag assignments for the UNIVERSAL class in ITU-T X.680.
             </summary>
         </member>
         <member name="F:System.Formats.Asn1.UniversalTagNumber.EndOfContents">
@@ -4228,6 +4228,9 @@
         <member name="P:System.SR.AsnWriter_EncodeUnbalancedStack">
             <summary>Encode cannot be called while a Sequence, Set-Of, or Octet String is still open.</summary>
         </member>
+        <member name="P:System.SR.AsnWriter_ModifyingWhileEncoding">
+            <summary>The AsnWriter cannot be written to while performing the Encode callback.</summary>
+        </member>
         <member name="P:System.SR.AsnWriter_PopWrongTag">
             <summary>Cannot pop the requested tag as it is not currently in progress.</summary>
         </member>
@@ -4461,6 +4464,9 @@
         </member>
         <member name="P:System.Diagnostics.CodeAnalysis.MemberNotNullWhenAttribute.Members">
             <summary>Gets field or property member names.</summary>
+        </member>
+        <member name="T:System.ExceptionPolyfills">
+            <summary>Provides downlevel polyfills for static methods on Exception-derived types.</summary>
         </member>
     </members>
 </doc>

@@ -1,12 +1,12 @@
+Imports System.IO
+Imports System.Diagnostics
+Imports System.Security.Cryptography
+
 ''' <summary>
 ''' Core engine orchestrating update workflow.
 ''' Uses async retry, single SFTP connection, percentage-based progress,
 ''' and installer integrity verification.
 ''' </summary>
-Imports System.IO
-Imports System.Diagnostics
-Imports System.Security.Cryptography
-
 Public Class UpdaterEngine
     Private ReadOnly email As New EmailService()
     Private Const MAX_RETRIES As Integer = 3
@@ -220,15 +220,18 @@ Public Class UpdaterEngine
     Private Async Function RetryOperationAsync(Of T)(operation As Func(Of Task(Of T)), operationName As String) As Task(Of T)
         Dim lastEx As Exception = Nothing
         For attempt As Integer = 1 To MAX_RETRIES
+            Dim shouldDelay As Boolean = False
             Try
                 Return Await operation()
             Catch ex As Exception
                 lastEx = ex
                 Logger.Log($"Attempt {attempt}/{MAX_RETRIES} for {operationName} failed: {ex.Message}", Logger.LogLevel.Warning)
-                If attempt < MAX_RETRIES Then
-                    Await Task.Delay(RETRY_DELAY_MS * attempt)
-                End If
+                shouldDelay = (attempt < MAX_RETRIES)
             End Try
+            ' Await cannot be inside Catch in VB.NET (.NET Framework)
+            If shouldDelay Then
+                Await Task.Delay(RETRY_DELAY_MS * attempt)
+            End If
         Next
         Throw New Exception($"{operationName} failed after {MAX_RETRIES} attempts", lastEx)
     End Function

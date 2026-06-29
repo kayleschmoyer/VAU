@@ -19,7 +19,7 @@
     <member name="M:System.Security.Cryptography.Xml.CipherData.#ctor(System.Security.Cryptography.Xml.CipherReference)">
       <summary>Initializes a new instance of the <see cref="T:System.Security.Cryptography.Xml.CipherData" /> class using a <see cref="T:System.Security.Cryptography.Xml.CipherReference" /> object.</summary>
       <param name="cipherReference">The <see cref="T:System.Security.Cryptography.Xml.CipherReference" /> object to use.</param>
-      <exception cref="T:System.ArgumentNullException">The <paramref name="cipherValue" /> parameter is <see langword="null" />.</exception>
+      <exception cref="T:System.ArgumentNullException">The <paramref name="cipherReference" /> parameter is <see langword="null" />.</exception>
       <exception cref="T:System.Security.Cryptography.CryptographicException">The <see cref="P:System.Security.Cryptography.Xml.CipherData.CipherValue" /> property has already been set.</exception>
     </member>
     <member name="M:System.Security.Cryptography.Xml.CipherData.GetXml">
@@ -395,10 +395,10 @@
       <summary>Defines a mapping between a key name and a symmetric key or an asymmetric key.</summary>
       <param name="keyName">The name to map to <paramref name="keyObject" />.</param>
       <param name="keyObject">The symmetric key to map to <paramref name="keyName" />.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyName" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyName" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="keyObject" /> parameter is <see langword="null" />.</exception>
       <exception cref="T:System.Security.Cryptography.CryptographicException">The value of the <paramref name="keyObject" /> parameter is not an RSA algorithm or a symmetric key.</exception>
     </member>
@@ -409,10 +409,10 @@
       <summary>Decrypts an <see langword="&lt;EncryptedData&gt;" /> element using the specified symmetric algorithm.</summary>
       <param name="encryptedData">The data to decrypt.</param>
       <param name="symmetricAlgorithm">The symmetric key used to decrypt <paramref name="encryptedData" />.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="encryptedData" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="encryptedData" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="symmetricAlgorithm" /> parameter is <see langword="null" />.</exception>
       <returns>A byte array that contains the raw decrypted plain text.</returns>
     </member>
@@ -432,10 +432,10 @@
       <param name="keyData">An array of bytes that represents an encrypted <see langword="&lt;EncryptedKey&gt;" /> element.</param>
       <param name="rsa">The asymmetric key used to decrypt <paramref name="keyData" />.</param>
       <param name="useOAEP">A value that specifies whether to use Optimal Asymmetric Encryption Padding (OAEP).</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyData" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyData" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="rsa" /> parameter is <see langword="null" />.</exception>
       <returns>A byte array that contains the plain text key.</returns>
     </member>
@@ -443,10 +443,10 @@
       <summary>Decrypts an <see langword="&lt;EncryptedKey&gt;" /> element using a symmetric algorithm.</summary>
       <param name="keyData">An array of bytes that represents an encrypted <see langword="&lt;EncryptedKey&gt;" /> element.</param>
       <param name="symmetricAlgorithm">The symmetric key used to decrypt <paramref name="keyData" />.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyData" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyData" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="symmetricAlgorithm" /> parameter is <see langword="null" />.</exception>
       <exception cref="T:System.Security.Cryptography.CryptographicException">The value of the <paramref name="symmetricAlgorithm" /> element is not the Triple DES Key Wrap algorithm or the Advanced Encryption Standard (AES) Key Wrap algorithm (also called Rijndael).</exception>
       <returns>A byte array that contains the plain text key.</returns>
@@ -455,10 +455,10 @@
       <summary>Encrypts the outer XML of an element using the specified X.509 certificate.</summary>
       <param name="inputElement">The XML element to encrypt.</param>
       <param name="certificate">The X.509 certificate to use for encryption.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="certificate" /> parameter is <see langword="null" />.</exception>
       <exception cref="T:System.NotSupportedException">The value of the <paramref name="certificate" /> parameter does not represent an RSA key algorithm.</exception>
       <returns>An <see cref="T:System.Security.Cryptography.Xml.EncryptedData" /> element that represents the encrypted XML data.</returns>
@@ -467,15 +467,15 @@
       <summary>Encrypts the outer XML of an element using the specified key in the key mapping table.</summary>
       <param name="inputElement">The XML element to encrypt.</param>
       <param name="keyName">A key name that can be found in the key mapping table.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="keyName" /> parameter is <see langword="null" />.</exception>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The value of the <paramref name="keyName" /> parameter does not match a registered key name pair.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The value of the <paramref name="keyName" /> parameter does not match a registered key name pair.
+
+ -or-
+
  The cryptographic key described by the <paramref name="keyName" /> parameter is not supported.</exception>
       <returns>An <see cref="T:System.Security.Cryptography.Xml.EncryptedData" /> object that represents the encrypted XML data.</returns>
     </member>
@@ -483,10 +483,10 @@
       <summary>Encrypts data in the specified byte array using the specified symmetric algorithm.</summary>
       <param name="plaintext">The data to encrypt.</param>
       <param name="symmetricAlgorithm">The symmetric algorithm to use for encryption.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="plaintext" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="plaintext" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="symmetricAlgorithm" /> parameter is <see langword="null" />.</exception>
       <exception cref="T:System.Security.Cryptography.CryptographicException">The data could not be encrypted using the specified parameters.</exception>
       <returns>A byte array of encrypted data.</returns>
@@ -497,10 +497,10 @@
       <param name="symmetricAlgorithm">The symmetric algorithm to use for encryption.</param>
       <param name="content">
         <see langword="true" /> to encrypt only the contents of the element; <see langword="false" /> to encrypt the entire element.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="symmetricAlgorithm" /> parameter is <see langword="null" />.</exception>
       <returns>A byte array that contains the encrypted data.</returns>
     </member>
@@ -509,10 +509,10 @@
       <param name="keyData">The key to encrypt.</param>
       <param name="rsa">The asymmetric key used to encrypt <paramref name="keyData" />.</param>
       <param name="useOAEP">A value that specifies whether to use Optimal Asymmetric Encryption Padding (OAEP).</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyData" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyData" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="rsa" /> parameter is <see langword="null" />.</exception>
       <returns>A byte array that represents the encrypted value of the <paramref name="keyData" /> parameter.</returns>
     </member>
@@ -520,10 +520,10 @@
       <summary>Encrypts a key using a symmetric algorithm that a recipient uses to decrypt an <see langword="&lt;EncryptedData&gt;" /> element.</summary>
       <param name="keyData">The key to encrypt.</param>
       <param name="symmetricAlgorithm">The symmetric key used to encrypt <paramref name="keyData" />.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyData" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="keyData" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="symmetricAlgorithm" /> parameter is <see langword="null" />.</exception>
       <exception cref="T:System.Security.Cryptography.CryptographicException">The value of the <paramref name="symmetricAlgorithm" /> parameter is not the Triple DES Key Wrap algorithm or the Advanced Encryption Standard (AES) Key Wrap algorithm (also called Rijndael).</exception>
       <returns>A byte array that represents the encrypted value of the <paramref name="keyData" /> parameter.</returns>
@@ -533,11 +533,11 @@
       <param name="encryptedData">The <see cref="T:System.Security.Cryptography.Xml.EncryptedData" /> object that contains the initialization vector (IV) to retrieve.</param>
       <param name="symmetricAlgorithmUri">The Uniform Resource Identifier (URI) that describes the cryptographic algorithm associated with the <paramref name="encryptedData" /> value.</param>
       <exception cref="T:System.ArgumentNullException">The value of the <paramref name="encryptedData" /> parameter is <see langword="null" />.</exception>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The value of the <paramref name="encryptedData" /> parameter has an <see cref="P:System.Security.Cryptography.Xml.EncryptedType.EncryptionMethod" /> property that is null.  
-  
- -or-  
-  
- The value of the <paramref name="symmetricAlgorithmUrisymAlgUri" /> parameter is not a supported algorithm.</exception>
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The value of the <paramref name="encryptedData" /> parameter has an <see cref="P:System.Security.Cryptography.Xml.EncryptedType.EncryptionMethod" /> property that is null.
+
+ -or-
+
+The value of the <paramref name="symmetricAlgorithmUri" /> parameter is not a supported algorithm.</exception>
       <returns>A byte array that contains the decryption initialization vector (IV).</returns>
     </member>
     <member name="M:System.Security.Cryptography.Xml.EncryptedXml.GetDecryptionKey(System.Security.Cryptography.Xml.EncryptedData,System.String)">
@@ -545,10 +545,10 @@
       <param name="encryptedData">The <see cref="T:System.Security.Cryptography.Xml.EncryptedData" /> object that contains the decryption key to retrieve.</param>
       <param name="symmetricAlgorithmUri">The size of the decryption key to retrieve.</param>
       <exception cref="T:System.ArgumentNullException">The value of the <paramref name="encryptedData" /> parameter is <see langword="null" />.</exception>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The encryptedData parameter has an <see cref="P:System.Security.Cryptography.Xml.EncryptedType.EncryptionMethod" /> property that is null.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The encryptedData parameter has an <see cref="P:System.Security.Cryptography.Xml.EncryptedType.EncryptionMethod" /> property that is null.
+
+ -or-
+
  The encrypted key cannot be retrieved using the specified parameters.</exception>
       <returns>A <see cref="T:System.Security.Cryptography.SymmetricAlgorithm" /> object associated with the decryption key.</returns>
     </member>
@@ -562,10 +562,10 @@
       <summary>Replaces an <see langword="&lt;EncryptedData&gt;" /> element with a specified decrypted sequence of bytes.</summary>
       <param name="inputElement">The <see langword="&lt;EncryptedData&gt;" /> element to replace.</param>
       <param name="decryptedData">The decrypted data to replace <paramref name="inputElement" /> with.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="decryptedData" /> parameter is <see langword="null" />.</exception>
     </member>
     <member name="M:System.Security.Cryptography.Xml.EncryptedXml.ReplaceElement(System.Xml.XmlElement,System.Security.Cryptography.Xml.EncryptedData,System.Boolean)">
@@ -574,10 +574,10 @@
       <param name="encryptedData">The <see cref="T:System.Security.Cryptography.Xml.EncryptedData" /> object to replace the <paramref name="inputElement" /> parameter with.</param>
       <param name="content">
         <see langword="true" /> to replace only the contents of the element; <see langword="false" /> to replace the entire element.</param>
-      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentNullException">The value of the <paramref name="inputElement" /> parameter is <see langword="null" />.
+
+ -or-
+
  The value of the <paramref name="encryptedData" /> parameter is <see langword="null" />.</exception>
     </member>
     <member name="P:System.Security.Cryptography.Xml.EncryptedXml.DocumentEvidence">
@@ -605,7 +605,7 @@
       <returns>An <see cref="T:System.Xml.XmlResolver" /> object.</returns>
     </member>
     <member name="P:System.Security.Cryptography.Xml.EncryptedXml.XmlDSigSearchDepth">
-      <summary>Gets or sets the XML digital signature recursion depth to prevent infinite recursion and stack overflow. This might happen if the digital signature XML contains the URI which then points back to the original XML.</summary>
+      <summary>Gets or sets the XML digital signature recursion depth to prevent infinite recursion and stack overflow. This might happen if the digital signature XML contains the URI that then points back to the original XML.</summary>
       <returns>Returns <see cref="T:System.Int32" />.</returns>
     </member>
     <member name="T:System.Security.Cryptography.Xml.EncryptionMethod">
@@ -1023,10 +1023,10 @@
       <summary>Parses the input <see cref="T:System.Xml.XmlElement" /> object and configures the internal state of the <see cref="T:System.Security.Cryptography.Xml.KeyInfoX509Data" /> object to match.</summary>
       <param name="element">The <see cref="T:System.Xml.XmlElement" /> object that specifies the state of the <see cref="T:System.Security.Cryptography.Xml.KeyInfoX509Data" /> object.</param>
       <exception cref="T:System.ArgumentNullException">The <paramref name="element" /> parameter is <see langword="null" />.</exception>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="element" /> parameter does not contain an &lt;<see langword="X509IssuerName" />&gt; node.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="element" /> parameter does not contain an &lt;<see langword="X509IssuerName" />&gt; node.
+
+ -or-
+
  The <paramref name="element" /> parameter does not contain an &lt;<see langword="X509SerialNumber" />&gt; node.</exception>
     </member>
     <member name="P:System.Security.Cryptography.Xml.KeyInfoX509Data.Certificates">
@@ -1085,10 +1085,10 @@
     </member>
     <member name="M:System.Security.Cryptography.Xml.Reference.GetXml">
       <summary>Returns the XML representation of the <see cref="T:System.Security.Cryptography.Xml.Reference" />.</summary>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <see cref="P:System.Security.Cryptography.Xml.Reference.DigestMethod" /> property is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <see cref="P:System.Security.Cryptography.Xml.Reference.DigestMethod" /> property is <see langword="null" />.
+
+ -or-
+
  The <see cref="P:System.Security.Cryptography.Xml.Reference.DigestValue" /> property is <see langword="null" />.</exception>
       <returns>The XML representation of the <see cref="T:System.Security.Cryptography.Xml.Reference" />.</returns>
     </member>
@@ -1096,10 +1096,10 @@
       <summary>Loads a <see cref="T:System.Security.Cryptography.Xml.Reference" /> state from an XML element.</summary>
       <param name="value">The XML element from which to load the <see cref="T:System.Security.Cryptography.Xml.Reference" /> state.</param>
       <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> parameter is <see langword="null" />.</exception>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="value" /> parameter does not contain any transforms.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="value" /> parameter does not contain any transforms.
+
+ -or-
+
  The <paramref name="value" /> parameter contains an unknown transform.</exception>
     </member>
     <member name="P:System.Security.Cryptography.Xml.Reference.DigestMethod">
@@ -1261,10 +1261,10 @@
     </member>
     <member name="M:System.Security.Cryptography.Xml.Signature.GetXml">
       <summary>Returns the XML representation of the <see cref="T:System.Security.Cryptography.Xml.Signature" />.</summary>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <see cref="P:System.Security.Cryptography.Xml.Signature.SignedInfo" /> property is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <see cref="P:System.Security.Cryptography.Xml.Signature.SignedInfo" /> property is <see langword="null" />.
+
+ -or-
+
  The <see cref="P:System.Security.Cryptography.Xml.Signature.SignatureValue" /> property is <see langword="null" />.</exception>
       <returns>The XML representation of the <see cref="T:System.Security.Cryptography.Xml.Signature" />.</returns>
     </member>
@@ -1272,10 +1272,10 @@
       <summary>Loads a <see cref="T:System.Security.Cryptography.Xml.Signature" /> state from an XML element.</summary>
       <param name="value">The XML element from which to load the <see cref="T:System.Security.Cryptography.Xml.Signature" /> state.</param>
       <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> parameter is <see langword="null" />.</exception>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="value" /> parameter does not contain a valid <see cref="P:System.Security.Cryptography.Xml.Signature.SignatureValue" />.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="value" /> parameter does not contain a valid <see cref="P:System.Security.Cryptography.Xml.Signature.SignatureValue" />.
+
+ -or-
+
  The <paramref name="value" /> parameter does not contain a valid <see cref="P:System.Security.Cryptography.Xml.Signature.SignedInfo" />.</exception>
     </member>
     <member name="P:System.Security.Cryptography.Xml.Signature.Id">
@@ -1322,10 +1322,10 @@
     </member>
     <member name="M:System.Security.Cryptography.Xml.SignedInfo.GetXml">
       <summary>Returns the XML representation of the <see cref="T:System.Security.Cryptography.Xml.SignedInfo" /> object.</summary>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <see cref="P:System.Security.Cryptography.Xml.SignedInfo.SignatureMethod" /> property is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <see cref="P:System.Security.Cryptography.Xml.SignedInfo.SignatureMethod" /> property is <see langword="null" />.
+
+ -or-
+
  The <see cref="P:System.Security.Cryptography.Xml.SignedInfo.References" /> property is empty.</exception>
       <returns>The XML representation of the <see cref="T:System.Security.Cryptography.Xml.SignedInfo" /> instance.</returns>
     </member>
@@ -1333,14 +1333,14 @@
       <summary>Loads a <see cref="T:System.Security.Cryptography.Xml.SignedInfo" /> state from an XML element.</summary>
       <param name="value">The XML element from which to load the <see cref="T:System.Security.Cryptography.Xml.SignedInfo" /> state.</param>
       <exception cref="T:System.ArgumentNullException">The <paramref name="value" /> parameter is <see langword="null" />.</exception>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="value" /> parameter is not a valid <see cref="T:System.Security.Cryptography.Xml.SignedInfo" /> element.  
-  
- -or-  
-  
- The <paramref name="value" /> parameter does not contain a valid <see cref="P:System.Security.Cryptography.Xml.SignedInfo.CanonicalizationMethod" /> property.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="value" /> parameter is not a valid <see cref="T:System.Security.Cryptography.Xml.SignedInfo" /> element.
+
+ -or-
+
+ The <paramref name="value" /> parameter does not contain a valid <see cref="P:System.Security.Cryptography.Xml.SignedInfo.CanonicalizationMethod" /> property.
+
+ -or-
+
  The <paramref name="value" /> parameter does not contain a valid <see cref="P:System.Security.Cryptography.Xml.SignedInfo.SignatureMethod" /> property.</exception>
     </member>
     <member name="P:System.Security.Cryptography.Xml.SignedInfo.CanonicalizationMethod">
@@ -2001,10 +2001,10 @@
     <member name="M:System.Security.Cryptography.Xml.XmlDsigExcC14NTransform.GetOutput(System.Type)">
       <summary>Returns the output of the current <see cref="T:System.Security.Cryptography.Xml.XmlDsigExcC14NTransform" /> object as an object of the specified type.</summary>
       <param name="type">The type of the output to return. This must be one of the types in the <see cref="P:System.Security.Cryptography.Xml.XmlDsigExcC14NTransform.OutputTypes" /> property.</param>
-      <exception cref="T:System.ArgumentException">The <paramref name="type" /> parameter is not a <see cref="T:System.IO.Stream" /> object.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentException">The <paramref name="type" /> parameter is not a <see cref="T:System.IO.Stream" /> object.
+
+ -or-
+
  The <paramref name="type" /> parameter does not derive from a <see cref="T:System.IO.Stream" /> object.</exception>
       <returns>The output of the current <see cref="T:System.Security.Cryptography.Xml.XmlDsigExcC14NTransform" /> object as an object of the specified type.</returns>
     </member>
@@ -2015,14 +2015,14 @@
     <member name="M:System.Security.Cryptography.Xml.XmlDsigExcC14NTransform.LoadInput(System.Object)">
       <summary>When overridden in a derived class, loads the specified input into the current <see cref="T:System.Security.Cryptography.Xml.XmlDsigExcC14NTransform" /> object.</summary>
       <param name="obj">The input to load into the current <see cref="T:System.Security.Cryptography.Xml.XmlDsigExcC14NTransform" /> object.</param>
-      <exception cref="T:System.ArgumentException">The <paramref name="obj" /> parameter is not a <see cref="T:System.IO.Stream" /> object.  
-  
- -or-  
-  
- The <paramref name="obj" /> parameter is not an <see cref="T:System.Xml.XmlDocument" /> object.  
-  
- -or-  
-  
+      <exception cref="T:System.ArgumentException">The <paramref name="obj" /> parameter is not a <see cref="T:System.IO.Stream" /> object.
+
+ -or-
+
+ The <paramref name="obj" /> parameter is not an <see cref="T:System.Xml.XmlDocument" /> object.
+
+ -or-
+
  The <paramref name="obj" /> parameter is not an <see cref="T:System.Xml.XmlNodeList" /> object.</exception>
     </member>
     <member name="P:System.Security.Cryptography.Xml.XmlDsigExcC14NTransform.InclusiveNamespacesPrefixList">
@@ -2070,10 +2070,10 @@
     <member name="M:System.Security.Cryptography.Xml.XmlDsigXPathTransform.LoadInnerXml(System.Xml.XmlNodeList)">
       <summary>Parses the specified <see cref="T:System.Xml.XmlNodeList" /> object as transform-specific content of a <see langword="&lt;Transform&gt;" /> element and configures the internal state of the current <see cref="T:System.Security.Cryptography.Xml.XmlDsigXPathTransform" /> object to match the <see langword="&lt;Transform&gt;" /> element.</summary>
       <param name="nodeList">An <see cref="T:System.Xml.XmlNodeList" /> object to load into the current <see cref="T:System.Security.Cryptography.Xml.XmlDsigXPathTransform" /> object.</param>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="nodeList" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="nodeList" /> parameter is <see langword="null" />.
+
+ -or-
+
  The <paramref name="nodeList" /> parameter does not contain an <see cref="T:System.Security.Cryptography.Xml.XmlDsigXPathTransform" /> element.</exception>
     </member>
     <member name="M:System.Security.Cryptography.Xml.XmlDsigXPathTransform.LoadInput(System.Object)">
@@ -2116,10 +2116,10 @@
     <member name="M:System.Security.Cryptography.Xml.XmlDsigXsltTransform.LoadInnerXml(System.Xml.XmlNodeList)">
       <summary>Parses the specified <see cref="T:System.Xml.XmlNodeList" /> object as transform-specific content of a <see langword="&lt;Transform&gt;" /> element and configures the internal state of the current <see cref="T:System.Security.Cryptography.Xml.XmlDsigXsltTransform" /> object to match the <see langword="&lt;Transform&gt;" /> element.</summary>
       <param name="nodeList">An <see cref="T:System.Xml.XmlNodeList" /> object that encapsulates an XSLT style sheet to load into the current <see cref="T:System.Security.Cryptography.Xml.XmlDsigXsltTransform" /> object. This style sheet is applied to the document loaded by the <see cref="M:System.Security.Cryptography.Xml.XmlDsigXsltTransform.LoadInput(System.Object)" /> method.</param>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="nodeList" /> parameter is <see langword="null" />.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The <paramref name="nodeList" /> parameter is <see langword="null" />.
+
+ -or-
+
  The <paramref name="nodeList" /> parameter does not contain an <see cref="T:System.Security.Cryptography.Xml.XmlDsigXsltTransform" /> object.</exception>
     </member>
     <member name="M:System.Security.Cryptography.Xml.XmlDsigXsltTransform.LoadInput(System.Object)">
@@ -2161,18 +2161,18 @@
     <member name="M:System.Security.Cryptography.Xml.XmlLicenseTransform.LoadInput(System.Object)">
       <summary>Loads the specified input into the current <see cref="T:System.Security.Cryptography.Xml.XmlLicenseTransform" /> object.</summary>
       <param name="obj">The input to load into the current <see cref="T:System.Security.Cryptography.Xml.XmlLicenseTransform" /> object. The type of the input object must be <see cref="T:System.Xml.XmlDocument" />.</param>
-      <exception cref="T:System.Security.Cryptography.CryptographicException">The context was not set before this transform was invoked.  
-  
- -or-  
-  
- The <see langword="&lt;issuer&gt;" /> element was not set before this transform was invoked.  
-  
- -or-  
-  
- The <see langword="&lt;license&gt;" /> element was not set before this transform was invoked.  
-  
- -or-  
-  
+      <exception cref="T:System.Security.Cryptography.CryptographicException">The context was not set before this transform was invoked.
+
+ -or-
+
+ The <see langword="&lt;issuer&gt;" /> element was not set before this transform was invoked.
+
+ -or-
+
+ The <see langword="&lt;license&gt;" /> element was not set before this transform was invoked.
+
+ -or-
+
  The <see cref="P:System.Security.Cryptography.Xml.XmlLicenseTransform.Decryptor" /> property was not set before this transform was invoked.</exception>
     </member>
     <member name="P:System.Security.Cryptography.Xml.XmlLicenseTransform.Decryptor">

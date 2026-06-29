@@ -1,12 +1,12 @@
-''' <summary>
-''' Handles communication with the remote SFTP server to check and download updates.
-''' Uses a single connection per update cycle, verifies host keys, and disconnects properly.
-''' </summary>
 Imports Renci.SshNet
 Imports Renci.SshNet.Common
 Imports System.IO
 Imports System.Linq
 
+''' <summary>
+''' Handles communication with the remote SFTP server to check and download updates.
+''' Uses a single connection per update cycle, verifies host keys, and disconnects properly.
+''' </summary>
 Public Class SftpService
     Implements IDisposable
 
