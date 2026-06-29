@@ -25,6 +25,9 @@ Public Class MainForm
     ''' </summary>
     Public Sub New()
         InitializeComponent()
+
+        If Me.DesignMode Then Return
+
         Me.DoubleBuffered = True
         ApplyBranding()
 
@@ -344,7 +347,4 @@ Public Class MainForm
         If exitCode <> 0 Then
             Environment.ExitCode = exitCode
         End If
-        Application.Exit()
-    End Sub
-
-End Class
+        App

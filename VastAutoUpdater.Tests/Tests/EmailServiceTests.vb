@@ -1,6 +1,6 @@
-Imports Microsoft.VisualStudio.TestTools.UnitTesting
-
 Option Strict On
+
+Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 ''' <summary>
 ''' Tests for EmailService validation and early-return paths.

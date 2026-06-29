@@ -1,7 +1,8 @@
+Option Strict On
+
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 Imports System.Threading
-
-Option Strict On
+Imports System.Threading.Tasks
 
 ''' <summary>
 ''' Tests for UpdaterEngine using mock SFTP and email services.
@@ -152,7 +153,4 @@ Public Class UpdaterEngineTests
     Public Sub Constructor_DefaultServices_DoesNotThrow()
         ' Verify the parameterless constructor works
         Dim engine As New UpdaterEngine()
-        Assert.IsNotNull(engine)
-    End Sub
-
-    <TestM
+        Assert.IsNotNull(
