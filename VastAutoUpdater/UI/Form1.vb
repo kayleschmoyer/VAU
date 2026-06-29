@@ -97,11 +97,21 @@ Public Class VASTUpdater
     End Sub
 
     Private Async Function RunUpdate() As Task
-        Dim user = txtSftpUsername.Text
-        Dim pass = txtSftpPassword.Text
+        Dim user As String
+        Dim pass As String
+
+        If runSilently Then
+            ' In silent mode, read SFTP credentials from App.config
+            user = ConfigManager.SftpUsername
+            pass = ConfigManager.SftpPassword
+            Logger.Log("Silent mode: using credentials from configuration", Logger.LogLevel.Info)
+        Else
+            user = txtSftpUsername.Text
+            pass = txtSftpPassword.Text
+        End If
 
         If String.IsNullOrWhiteSpace(user) OrElse String.IsNullOrWhiteSpace(pass) Then
-            Logger.Log("Credentials required", Logger.LogLevel.Warning)
+            Logger.Log("Credentials required but not available", Logger.LogLevel.Warning)
             If Not runSilently Then MessageBox.Show("Enter SFTP credentials")
             Return
         End If
