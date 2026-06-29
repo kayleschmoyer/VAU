@@ -1,4 +1,5 @@
 Imports System.Drawing.Drawing2D
+Imports System.Threading
 
 Public Class MainForm
 
@@ -6,6 +7,7 @@ Public Class MainForm
     Private runSilently As Boolean
     Private isDragging As Boolean = False
     Private dragStart As Point
+    Private updateCts As CancellationTokenSource = Nothing
 
     ' Brand colors
     Private Shared ReadOnly Magenta As Color = Color.FromArgb(237, 1, 127)
@@ -127,6 +129,9 @@ Public Class MainForm
             ' Encrypt plaintext credentials on first run
             ConfigManager.EncryptOnFirstRun()
 
+            ' Validate configuration and log any missing settings
+            ConfigManager.ValidateConfiguration()
+
             Dim exePath As String = VersionService.FindVastExecutable()
             If Not String.IsNullOrEmpty(exePath) Then
                 Dim version As String = VersionService.GetFileVersion(exePath)
@@ -149,16 +154,26 @@ Public Class MainForm
     ' ── Update logic ─────────────────────────────────────────────────
 
     Private Async Sub BtnCheckForUpdates_Click(sender As Object, e As EventArgs)
-        btnCheckForUpdates.Enabled = False
-        btnCheckForUpdates.Text = "CHECKING..."
-        Await RunUpdate()
-        btnCheckForUpdates.Text = "CHECK FOR UPDATES"
-        btnCheckForUpdates.Enabled = True
+        If updateCts IsNot Nothing Then
+            ' Cancel in progress
+            updateCts.Cancel()
+            Return
+        End If
+
+        updateCts = New CancellationTokenSource()
+        btnCheckForUpdates.Text = "CANCEL"
+        Try
+            Await RunUpdate(updateCts.Token)
+        Finally
+            updateCts.Dispose()
+            updateCts = Nothing
+            btnCheckForUpdates.Text = "CHECK FOR UPDATES"
+        End Try
     End Sub
 
     Private Async Sub RunSilentUpdate()
         Try
-            Await RunUpdate()
+            Await RunUpdate(CancellationToken.None)
             Logger.Log("Silent mode finished successfully, exiting", Logger.LogLevel.Info)
             ExitApplication(0)
         Catch ex As Exception
@@ -167,7 +182,7 @@ Public Class MainForm
         End Try
     End Sub
 
-    Private Async Function RunUpdate() As Task
+    Private Async Function RunUpdate(cancelToken As CancellationToken) As Task
         Dim user As String
         Dim pass As String
 
@@ -209,7 +224,7 @@ Public Class MainForm
                     Catch
                         ' Form may be disposed during exit
                     End Try
-                End Sub)
+                End Sub, cancelToken)
 
             If Not runSilently Then
                 Try
@@ -224,30 +239,13 @@ Public Class MainForm
                 Logger.Log("Update completed in UI mode.", Logger.LogLevel.Info)
             End If
 
-        Catch ex As Exception
-            Logger.Log($"Update failed: {ex.Message}", Logger.LogLevel.Error)
-
+        Catch ex As OperationCanceledException
+            Logger.Log("Update check cancelled by user", Logger.LogLevel.Info)
             If Not runSilently Then
                 Try
                     Me.Invoke(Sub()
-                                  lblStatus.Text = $"Error: {ex.Message}"
-                                  lblStatus.ForeColor = Color.FromArgb(200, 0, 0)
+                                  lblStatus.Text = "Update check cancelled."
+                                  lblStatus.ForeColor = Charcoal
                                   pnlProgress.Visible = False
                               End Sub)
-                Catch
-                End Try
-            End If
-
-            If runSilently Then Throw
-        End Try
-    End Function
-
-    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs)
-        Logger.Log("Application closing", Logger.LogLevel.Info)
-    End Sub
-
-    Private Sub ExitApplication(exitCode As Integer)
-        Logger.Log($"Application exiting with code {exitCode}", Logger.LogLevel.Info)
-        If exitCode <> 0 Then
-            Environment.ExitCode = exitCode
-     
+              

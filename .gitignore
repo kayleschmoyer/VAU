@@ -1,8 +1,12 @@
-# Ignore Visual Studio build files
-.vs/
+# Build output
 bin/
 obj/
+*.exe
+
+# Visual Studio
+.vs/
 *.suo
 *.user
-*.exe
+
+# Security
 *.pfx

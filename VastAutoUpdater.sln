@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VastAutoUpdater", "VastAutoUpdater\VastAutoUpdater.vbproj", "{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "VastAutoUpdater.Tests", "VastAutoUpdater.Tests\VastAutoUpdater.Tests.vbproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,9 +16,4 @@ Global
 		{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-EndGlobal
+		{DC50EBA9-4DE8-4EFA-8E26

@@ -1,0 +1,32 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet packages
+      run: nuget restore VastAutoUpdater.sln
+
+    - name: Build Release
+      run: msbuild VastAutoUpdater.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
+
+    - name: Run Tests
+      uses: microsoft/vstest-action@v1.0.0
+      with:
+        testAssembly: VastAutoUpdater.Tests\bin\Release\VastAutoUpdater.Tests.dll

@@ -1,6 +1,7 @@
 Imports System.IO
 Imports System.Diagnostics
 Imports System.Security.Cryptography
+Imports System.Threading
 
 ''' <summary>
 ''' Core engine orchestrating update workflow.
@@ -15,7 +16,7 @@ Public Class UpdaterEngine
     ''' <summary>
     ''' Perform the update workflow with retry logic and send a summary email.
     ''' </summary>
-    Public Async Function PerformUpdateCheck(username As String, password As String, progress As Action(Of Integer, String)) As Task
+    Public Async Function PerformUpdateCheck(username As String, password As String, progress As Action(Of Integer, String), Optional cancelToken As CancellationToken = Nothing) As Task
         Dim success As Boolean = False
         Dim message As String = String.Empty
         Dim caughtEx As Exception = Nothing
@@ -39,6 +40,7 @@ Public Class UpdaterEngine
                 End If
                 Dim prefix As String = $"{parsedCurrent.Major}.{parsedCurrent.Minor}"
 
+                cancelToken.ThrowIfCancellationRequested()
                 progress(10, "Connecting to update server...")
 
                 ' Connect once, reuse for version check + download
@@ -76,6 +78,7 @@ Public Class UpdaterEngine
                     Return
                 End If
 
+                cancelToken.ThrowIfCancellationRequested()
                 Logger.Log($"Update available: {currentVersion} -> {latest}", Logger.LogLevel.Info)
                 progress(20, $"Downloading version {latest}...")
 
@@ -105,6 +108,8 @@ Public Class UpdaterEngine
                 If Not installerInfo.Exists OrElse installerInfo.Length = 0 Then
                     Throw New IOException("Downloaded installer is empty or missing")
                 End If
+
+                cancelToken.ThrowIfCancellationRequested()
 
                 ' Verify installer integrity via SHA-256 hash sidecar (if available)
                 Await VerifyInstallerHash(sftp, latest, installer)
@@ -237,12 +242,4 @@ Public Class UpdaterEngine
                 Logger.Log($"Attempt {attempt}/{MAX_RETRIES} for {operationName} failed: {ex.Message}", Logger.LogLevel.Warning)
                 shouldDelay = (attempt < MAX_RETRIES)
             End Try
-            ' Await cannot be inside Catch in VB.NET (.NET Framework)
-            If shouldDelay Then
-                Await Task.Delay(RETRY_DELAY_MS * attempt)
-            End If
-        Next
-        Throw New Exception($"{operationName} failed after {MAX_RETRIES} attempts", lastEx)
-    End Function
-
-End Class
+            ' Await cannot be inside Catch in VB.NET (.NE
