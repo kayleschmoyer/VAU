@@ -4,7 +4,6 @@
 ''' </summary>
 Imports System.IO
 Imports System.Diagnostics
-Imports System.Security.Cryptography
 
 Public Class UpdaterEngine
     Private ReadOnly sftp As New SftpService()
@@ -140,12 +139,13 @@ Public Class UpdaterEngine
                 Logger.Log($"Stack trace: {ex.StackTrace}", Logger.LogLevel.Error)
             End If
             message = ex.Message
-        Finally
-            Try
-                Await Task.Run(Sub() email.SendSummary(success, message, caughtEx))
-            Catch emailEx As Exception
-                Logger.Log($"Failed to send summary email: {emailEx.Message}", Logger.LogLevel.Warning)
-            End Try
+        End Try
+
+        ' Send summary email (outside Try/Finally since Await not allowed there)
+        Try
+            Await Task.Run(Sub() email.SendSummary(success, message, caughtEx))
+        Catch emailEx As Exception
+            Logger.Log($"Failed to send summary email: {emailEx.Message}", Logger.LogLevel.Warning)
         End Try
     End Function
 
