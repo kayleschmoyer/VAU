@@ -83,11 +83,11 @@ Public Class UpdaterEngine
                 Dim installer As String = InstallerPathService.GetInstallPath(latest)
 
                 ' Get remote file size for accurate progress
-                Dim remoteSize As Long = Await Task.Run(Function() sftp.GetRemoteFileSize(latest))
+                Dim remoteSize As Long = Await Task.Run(Function() sftp.GetRemoteFileSize($"{latest}.exe"))
                 If remoteSize <= 0 Then remoteSize = 1 ' avoid division by zero
 
                 Dim downloadOk As Boolean = Await Task.Run(
-                    Function() sftp.DownloadFile(latest, installer,
+                    Function() sftp.DownloadFile($"{latest}.exe", installer,
                         Sub(bytesTransferred As ULong)
                             ' Scale download progress from 20% to 90%
                             Dim ratio As Double = Math.Min(CDbl(bytesTransferred) / CDbl(remoteSize), 1.0)
@@ -125,10 +125,14 @@ Public Class UpdaterEngine
                         If exited AndAlso proc.ExitCode <> 0 Then
                             message = $"Installer exited with error code {proc.ExitCode}"
                             Logger.Log(message, Logger.LogLevel.Error)
+                        ElseIf exited Then
+                            success = True
+                            message = $"Update {latest} downloaded and installer completed"
+                            Logger.Log($"Installer completed: {installer} (exit code 0)", Logger.LogLevel.Info)
                         Else
                             success = True
                             message = $"Update {latest} downloaded and installer launched"
-                            Logger.Log($"Installer launched: {installer} (PID: {proc.Id})", Logger.LogLevel.Info)
+                            Logger.Log($"Installer still running: {installer} (PID: {proc.Id})", Logger.LogLevel.Info)
                         End If
                     End If
                 Catch ex As Exception
@@ -172,7 +176,8 @@ Public Class UpdaterEngine
     ''' </summary>
     Private Async Function VerifyInstallerHash(sftp As SftpService, version As String, localPath As String) As Task
         Try
-            Dim hashSize As Long = Await Task.Run(Function() sftp.GetRemoteFileSize(version & ".sha256"))
+            Dim hashFileName As String = $"{version}.exe.sha256"
+            Dim hashSize As Long = Await Task.Run(Function() sftp.GetRemoteFileSize(hashFileName))
             If hashSize <= 0 Then
                 Logger.Log("No SHA-256 hash file available on server — skipping integrity check", Logger.LogLevel.Warning)
                 Return
@@ -180,7 +185,7 @@ Public Class UpdaterEngine
 
             ' Download the hash file
             Dim hashPath As String = localPath & ".sha256"
-            Await Task.Run(Function() sftp.DownloadFile(version & ".sha256", hashPath, Sub(b) Return))
+            Await Task.Run(Function() sftp.DownloadFile(hashFileName, hashPath, Sub(b) Return))
 
             ' Read expected hash
             Dim expectedHash As String = File.ReadAllText(hashPath).Trim().Split(" "c)(0).ToUpperInvariant()

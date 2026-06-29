@@ -25,6 +25,10 @@ Public Class SftpService
     Public Sub Connect(username As String, password As String)
         If client IsNot Nothing AndAlso client.IsConnected Then Return
 
+        If String.IsNullOrWhiteSpace(host) Then
+            Throw New InvalidOperationException("SFTP host is not configured in App.config")
+        End If
+
         ' Dispose stale client before creating a new one
         If client IsNot Nothing Then
             Try
@@ -113,11 +117,12 @@ Public Class SftpService
 
     ''' <summary>
     ''' Get the size of a remote file in bytes.
+    ''' Pass the full filename (e.g., "1.2.3.exe" or "1.2.3.sha256").
     ''' Returns 0 if the file doesn't exist.
     ''' </summary>
-    Public Function GetRemoteFileSize(version As String) As Long
+    Public Function GetRemoteFileSize(remoteFileName As String) As Long
         Try
-            Dim remotePath As String = $"{remoteDir}{version}.exe"
+            Dim remotePath As String = $"{remoteDir}{remoteFileName}"
             Dim attrs = client.GetAttributes(remotePath)
             Return attrs.Size
         Catch
@@ -126,12 +131,13 @@ Public Class SftpService
     End Function
 
     ''' <summary>
-    ''' Download the installer for the specified version to localPath.
+    ''' Download a remote file to localPath.
+    ''' Pass the full filename (e.g., "1.2.3.exe" or "1.2.3.sha256").
     ''' Returns True on success, False on failure.
     ''' Must call Connect() first.
     ''' </summary>
-    Public Function DownloadFile(version As String, localPath As String, progress As Action(Of ULong)) As Boolean
-        Dim remotePath As String = $"{remoteDir}{version}.exe"
+    Public Function DownloadFile(remoteFileName As String, localPath As String, progress As Action(Of ULong)) As Boolean
+        Dim remotePath As String = $"{remoteDir}{remoteFileName}"
         Dim tempPath As String = localPath & ".tmp"
 
         Logger.Log($"Downloading: {remotePath} -> {tempPath}", Logger.LogLevel.Info)

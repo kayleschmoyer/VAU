@@ -46,6 +46,8 @@ Public Module InstallerPathService
             If Not Directory.Exists(BasePath) Then Return
 
             Dim currentFile As String = $"{currentVersion}.exe"
+
+            ' Clean up old .exe installers
             For Each filePath In Directory.GetFiles(BasePath, "*.exe")
                 Dim fileName As String = Path.GetFileName(filePath)
                 If Not fileName.Equals(currentFile, StringComparison.OrdinalIgnoreCase) Then
@@ -56,6 +58,16 @@ Public Module InstallerPathService
                         Logger.Log($"Could not delete old installer '{fileName}': {ex.Message}", Logger.LogLevel.Warning)
                     End Try
                 End If
+            Next
+
+            ' Clean up stale .tmp partial downloads
+            For Each filePath In Directory.GetFiles(BasePath, "*.tmp")
+                Try
+                    File.Delete(filePath)
+                    Logger.Log($"Cleaned up partial download: {Path.GetFileName(filePath)}", Logger.LogLevel.Info)
+                Catch ex As Exception
+                    Logger.Log($"Could not delete temp file '{Path.GetFileName(filePath)}': {ex.Message}", Logger.LogLevel.Warning)
+                End Try
             Next
         Catch ex As Exception
             Logger.Log($"Error during installer cleanup: {ex.Message}", Logger.LogLevel.Warning)

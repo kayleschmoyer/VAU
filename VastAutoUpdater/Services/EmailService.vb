@@ -16,10 +16,15 @@ Public Class EmailService
             Dim emailFrom As String = ConfigManager.EmailFrom
             Dim smtpHost As String = ConfigManager.SmtpHost
 
+            Dim smtpUser As String = ConfigManager.SmtpUsername
+            Dim smtpPass As String = ConfigManager.SmtpPassword
+
             ' Validate required email config before attempting send
             If String.IsNullOrWhiteSpace(emailTo) OrElse
                String.IsNullOrWhiteSpace(emailFrom) OrElse
-               String.IsNullOrWhiteSpace(smtpHost) Then
+               String.IsNullOrWhiteSpace(smtpHost) OrElse
+               String.IsNullOrWhiteSpace(smtpUser) OrElse
+               String.IsNullOrWhiteSpace(smtpPass) Then
                 Logger.Log("Email configuration incomplete — skipping notification", Logger.LogLevel.Warning)
                 Return
             End If
@@ -49,7 +54,7 @@ Public Class EmailService
                 msg.Body = body
 
                 Using client As New SmtpClient(smtpHost, ConfigManager.SmtpPort)
-                    client.Credentials = New Net.NetworkCredential(ConfigManager.SmtpUsername, ConfigManager.SmtpPassword)
+                    client.Credentials = New Net.NetworkCredential(smtpUser, smtpPass)
                     client.EnableSsl = True
                     client.Timeout = 30000 ' 30 second timeout
                     client.Send(msg)

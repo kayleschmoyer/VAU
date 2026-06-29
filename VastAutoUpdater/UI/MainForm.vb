@@ -127,9 +127,6 @@ Public Class MainForm
             ' Encrypt plaintext credentials on first run
             ConfigManager.EncryptOnFirstRun()
 
-            ' Trim log file to prevent unbounded growth
-            Logger.TrimLogFile()
-
             Dim exePath As String = VersionService.FindVastExecutable()
             If Not String.IsNullOrEmpty(exePath) Then
                 Dim version As String = VersionService.GetFileVersion(exePath)
@@ -185,10 +182,11 @@ Public Class MainForm
 
         If String.IsNullOrWhiteSpace(user) OrElse String.IsNullOrWhiteSpace(pass) Then
             Logger.Log("Credentials required but not available", Logger.LogLevel.Warning)
-            If Not runSilently Then
-                lblStatus.Text = "Enter SFTP credentials above."
-                lblStatus.ForeColor = Color.FromArgb(200, 0, 80)
+            If runSilently Then
+                Throw New InvalidOperationException("SFTP credentials are not configured")
             End If
+            lblStatus.Text = "Enter SFTP credentials above."
+            lblStatus.ForeColor = Color.FromArgb(200, 0, 80)
             Return
         End If
 

@@ -140,7 +140,7 @@ Public Module ConfigManager
     ''' Encrypt a plaintext credential value using DPAPI (machine scope).
     ''' Returns the "enc:" prefixed base64 string suitable for App.config.
     ''' </summary>
-    Public Function EncryptValue(plaintext As String) As String
+    Private Function EncryptValue(plaintext As String) As String
         Dim plaintextBytes As Byte() = Encoding.UTF8.GetBytes(plaintext)
         Dim encryptedBytes As Byte() = ProtectedData.Protect(plaintextBytes, Nothing, DataProtectionScope.LocalMachine)
         Return ENCRYPTED_PREFIX & Convert.ToBase64String(encryptedBytes)
