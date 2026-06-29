@@ -1,4 +1,5 @@
 Imports System.IO
+Imports System.Text.RegularExpressions
 
 ''' <summary>
 ''' Helper methods related to installer storage paths.
@@ -23,8 +24,17 @@ Public Module InstallerPathService
     ''' Build the full path for a downloaded installer version.
     ''' </summary>
     Public Function GetInstallPath(version As String) As String
+        ' Validate version contains only digits and dots to prevent path traversal
+        If String.IsNullOrEmpty(version) OrElse Not Regex.IsMatch(version, "^\d+(\.\d+){1,3}$") Then
+            Throw New ArgumentException($"Invalid version format: {version}")
+        End If
         EnsureUpdateFolderExists()
-        Return Path.Combine(BasePath, $"{version}.exe")
+        Dim result As String = Path.Combine(BasePath, $"{version}.exe")
+        ' Belt-and-suspenders: verify the resolved path is inside BasePath
+        If Not Path.GetFullPath(result).StartsWith(Path.GetFullPath(BasePath), StringComparison.OrdinalIgnoreCase) Then
+            Throw New InvalidOperationException($"Path traversal detected: {result}")
+        End If
+        Return result
     End Function
 
     ''' <summary>

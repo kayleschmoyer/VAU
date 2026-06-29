@@ -1,7 +1,6 @@
 Imports System.Drawing.Drawing2D
 
 Public Class MainForm
-    Inherits Form
 
     Private engine As New UpdaterEngine()
     Private runSilently As Boolean
@@ -22,6 +21,7 @@ Public Class MainForm
         runSilently = args.Contains("silent")
 
         AddHandler Me.Load, AddressOf MainForm_Load
+        AddHandler Me.FormClosing, AddressOf MainForm_FormClosing
 
         If runSilently Then
             Me.WindowState = FormWindowState.Minimized
@@ -66,6 +66,7 @@ Public Class MainForm
 
     Private Sub PaintGradientHeader(sender As Object, e As PaintEventArgs)
         Dim pnl As Panel = DirectCast(sender, Panel)
+        If pnl.ClientRectangle.Width <= 0 OrElse pnl.ClientRectangle.Height <= 0 Then Return
         Using brush As New LinearGradientBrush(
             pnl.ClientRectangle,
             Magenta,
@@ -239,9 +240,16 @@ Public Class MainForm
         End Try
     End Function
 
+    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs)
+        Logger.Log("Application closing", Logger.LogLevel.Info)
+    End Sub
+
     Private Sub ExitApplication(exitCode As Integer)
         Logger.Log($"Application exiting with code {exitCode}", Logger.LogLevel.Info)
-        Environment.Exit(exitCode)
+        If exitCode <> 0 Then
+            Environment.ExitCode = exitCode
+        End If
+        Application.Exit()
     End Sub
 
 End Class

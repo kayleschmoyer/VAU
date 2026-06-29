@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("NewDownloadPatchandUpgrade")>
+<Assembly: AssemblyTitle("VastAutoUpdater")>
 <Assembly: AssemblyDescription("")>
 <Assembly: AssemblyCompany("KCS")>
-<Assembly: AssemblyProduct("NewDownloadPatchandUpgrade")>
+<Assembly: AssemblyProduct("VastAutoUpdater")>
 <Assembly: AssemblyCopyright("Copyright © KCS 2025")>
 <Assembly: AssemblyTrademark("")>
 

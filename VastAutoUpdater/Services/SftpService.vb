@@ -25,6 +25,15 @@ Public Class SftpService
     Public Sub Connect(username As String, password As String)
         If client IsNot Nothing AndAlso client.IsConnected Then Return
 
+        ' Dispose stale client before creating a new one
+        If client IsNot Nothing Then
+            Try
+                client.Dispose()
+            Catch
+            End Try
+            client = Nothing
+        End If
+
         client = New SftpClient(host, username, password)
         client.ConnectionInfo.Timeout = TimeSpan.FromSeconds(CONNECTION_TIMEOUT_SECONDS)
         client.OperationTimeout = TimeSpan.FromSeconds(OPERATION_TIMEOUT_SECONDS)
@@ -123,22 +132,36 @@ Public Class SftpService
     ''' </summary>
     Public Function DownloadFile(version As String, localPath As String, progress As Action(Of ULong)) As Boolean
         Dim remotePath As String = $"{remoteDir}{version}.exe"
+        Dim tempPath As String = localPath & ".tmp"
 
-        Logger.Log($"Downloading: {remotePath} -> {localPath}", Logger.LogLevel.Info)
+        Logger.Log($"Downloading: {remotePath} -> {tempPath}", Logger.LogLevel.Info)
 
-        Using fs As New FileStream(localPath, FileMode.Create, FileAccess.Write, FileShare.None)
-            client.DownloadFile(remotePath, fs, Sub(d) progress(d))
-        End Using
+        Try
+            Using fs As New FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None)
+                client.DownloadFile(remotePath, fs, Sub(d) progress(d))
+            End Using
 
-        ' Verify file was actually written
-        Dim fi As New FileInfo(localPath)
-        If fi.Exists AndAlso fi.Length > 0 Then
+            ' Verify temp file was actually written
+            Dim fi As New FileInfo(tempPath)
+            If Not fi.Exists OrElse fi.Length = 0 Then
+                Logger.Log($"Download produced empty file: {tempPath}", Logger.LogLevel.Error)
+                Return False
+            End If
+
+            ' Atomic rename: delete target if it exists, then move temp into place
+            If File.Exists(localPath) Then File.Delete(localPath)
+            File.Move(tempPath, localPath)
+
             Logger.Log($"Download completed: {localPath} ({fi.Length} bytes)", Logger.LogLevel.Info)
             Return True
-        Else
-            Logger.Log($"Download produced empty file: {localPath}", Logger.LogLevel.Error)
-            Return False
-        End If
+        Catch ex As Exception
+            ' Clean up partial download on failure
+            Try
+                If File.Exists(tempPath) Then File.Delete(tempPath)
+            Catch
+            End Try
+            Throw
+        End Try
     End Function
 
     Public Sub Dispose() Implements IDisposable.Dispose

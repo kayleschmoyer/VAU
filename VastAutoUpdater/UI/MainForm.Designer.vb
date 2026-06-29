@@ -82,7 +82,7 @@ Partial Class MainForm
         '
         Me.lblTitle.AutoSize = True
         Me.lblTitle.BackColor = System.Drawing.Color.Transparent
-        Me.lblTitle.Font = New System.Drawing.Font("Inter", 14.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
+        Me.lblTitle.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
         Me.lblTitle.ForeColor = System.Drawing.Color.White
         Me.lblTitle.Location = New System.Drawing.Point(16, 8)
         Me.lblTitle.Name = "lblTitle"
@@ -94,7 +94,7 @@ Partial Class MainForm
         '
         Me.lblSubtitle.AutoSize = True
         Me.lblSubtitle.BackColor = System.Drawing.Color.Transparent
-        Me.lblSubtitle.Font = New System.Drawing.Font("Inter", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
+        Me.lblSubtitle.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.lblSubtitle.ForeColor = System.Drawing.Color.FromArgb(255, 200, 230)
         Me.lblSubtitle.Location = New System.Drawing.Point(18, 32)
         Me.lblSubtitle.Name = "lblSubtitle"
@@ -110,7 +110,7 @@ Partial Class MainForm
         Me.btnClose.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(200, 0, 100)
         Me.btnClose.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(220, 0, 110)
         Me.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnClose.Font = New System.Drawing.Font("Inter", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.btnClose.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
         Me.btnClose.ForeColor = System.Drawing.Color.White
         Me.btnClose.Location = New System.Drawing.Point(484, 4)
         Me.btnClose.Name = "btnClose"
@@ -127,7 +127,7 @@ Partial Class MainForm
         Me.btnMinimize.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(200, 0, 100)
         Me.btnMinimize.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(220, 0, 110)
         Me.btnMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnMinimize.Font = New System.Drawing.Font("Inter", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.btnMinimize.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
         Me.btnMinimize.ForeColor = System.Drawing.Color.White
         Me.btnMinimize.Location = New System.Drawing.Point(450, 4)
         Me.btnMinimize.Name = "btnMinimize"
@@ -152,7 +152,7 @@ Partial Class MainForm
         ' lblUsername
         '
         Me.lblUsername.AutoSize = True
-        Me.lblUsername.Font = New System.Drawing.Font("Inter", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.lblUsername.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.lblUsername.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
         Me.lblUsername.Location = New System.Drawing.Point(16, 12)
         Me.lblUsername.Name = "lblUsername"
@@ -164,7 +164,7 @@ Partial Class MainForm
         '
         Me.txtSftpUsername.BackColor = System.Drawing.Color.White
         Me.txtSftpUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtSftpUsername.Font = New System.Drawing.Font("Inter", 11.0!)
+        Me.txtSftpUsername.Font = New System.Drawing.Font("Segoe UI", 11.0!)
         Me.txtSftpUsername.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
         Me.txtSftpUsername.Location = New System.Drawing.Point(16, 32)
         Me.txtSftpUsername.Name = "txtSftpUsername"
@@ -174,7 +174,7 @@ Partial Class MainForm
         ' lblPassword
         '
         Me.lblPassword.AutoSize = True
-        Me.lblPassword.Font = New System.Drawing.Font("Inter", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.lblPassword.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
         Me.lblPassword.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
         Me.lblPassword.Location = New System.Drawing.Point(16, 68)
         Me.lblPassword.Name = "lblPassword"
@@ -186,7 +186,7 @@ Partial Class MainForm
         '
         Me.txtSftpPassword.BackColor = System.Drawing.Color.White
         Me.txtSftpPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtSftpPassword.Font = New System.Drawing.Font("Inter", 11.0!)
+        Me.txtSftpPassword.Font = New System.Drawing.Font("Segoe UI", 11.0!)
         Me.txtSftpPassword.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
         Me.txtSftpPassword.Location = New System.Drawing.Point(16, 88)
         Me.txtSftpPassword.Name = "txtSftpPassword"
@@ -202,7 +202,7 @@ Partial Class MainForm
         Me.btnCheckForUpdates.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(190, 0, 100)
         Me.btnCheckForUpdates.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(210, 0, 115)
         Me.btnCheckForUpdates.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnCheckForUpdates.Font = New System.Drawing.Font("Inter", 11.0!, System.Drawing.FontStyle.Bold)
+        Me.btnCheckForUpdates.Font = New System.Drawing.Font("Segoe UI", 11.0!, System.Drawing.FontStyle.Bold)
         Me.btnCheckForUpdates.ForeColor = System.Drawing.Color.White
         Me.btnCheckForUpdates.Location = New System.Drawing.Point(24, 214)
         Me.btnCheckForUpdates.Name = "btnCheckForUpdates"
@@ -233,7 +233,7 @@ Partial Class MainForm
         '
         ' lblStatus
         '
-        Me.lblStatus.Font = New System.Drawing.Font("Inter", 9.5!, System.Drawing.FontStyle.Regular)
+        Me.lblStatus.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Regular)
         Me.lblStatus.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
         Me.lblStatus.Location = New System.Drawing.Point(24, 302)
         Me.lblStatus.Name = "lblStatus"
@@ -243,7 +243,7 @@ Partial Class MainForm
         '
         ' lblCurrentVersion
         '
-        Me.lblCurrentVersion.Font = New System.Drawing.Font("Inter", 9.0!, System.Drawing.FontStyle.Regular)
+        Me.lblCurrentVersion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular)
         Me.lblCurrentVersion.ForeColor = System.Drawing.Color.FromArgb(140, 140, 140)
         Me.lblCurrentVersion.Location = New System.Drawing.Point(24, 326)
         Me.lblCurrentVersion.Name = "lblCurrentVersion"

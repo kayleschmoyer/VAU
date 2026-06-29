@@ -121,12 +121,16 @@ Public Class UpdaterEngine
                     })
 
                     If proc IsNot Nothing Then
-                        Await Task.Run(Sub() proc.WaitForExit(10000))
-                        Logger.Log($"Installer launched: {installer} (PID: {proc.Id})", Logger.LogLevel.Info)
+                        Dim exited As Boolean = Await Task.Run(Function() proc.WaitForExit(10000))
+                        If exited AndAlso proc.ExitCode <> 0 Then
+                            message = $"Installer exited with error code {proc.ExitCode}"
+                            Logger.Log(message, Logger.LogLevel.Error)
+                        Else
+                            success = True
+                            message = $"Update {latest} downloaded and installer launched"
+                            Logger.Log($"Installer launched: {installer} (PID: {proc.Id})", Logger.LogLevel.Info)
+                        End If
                     End If
-
-                    success = True
-                    message = $"Update {latest} downloaded and installer launched"
                 Catch ex As Exception
                     message = $"Failed to launch installer: {ex.Message}"
                     Logger.Log(message, Logger.LogLevel.Error)
