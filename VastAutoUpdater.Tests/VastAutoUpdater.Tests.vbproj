@@ -73,4 +73,9 @@
       <Project>{DC50EBA9-4DE8-4EFA-8E26-4CF980C6A202}</Project>
       <Name>VastAutoUpdater</Name>
     </ProjectReference>
-  </
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+</Project>
