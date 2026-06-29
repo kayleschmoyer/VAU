@@ -40,7 +40,7 @@
     <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\..\..\..\..\ProgramData\VASTUpdater\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>VastAutoUpdater.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -50,7 +50,7 @@
     <DefineDebug>false</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\..\..\..\..\ProgramData\VASTUpdater\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>VastAutoUpdater.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
@@ -313,7 +313,7 @@
     <Compile Include="Services\UpdaterEngine.vb" />
     <Compile Include="Services\VersionService.vb" />
     <Compile Include="Services\InstallerPathService.vb" />
-    <Compile Include="Services\ScheduledTaskService.vb" />
+
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

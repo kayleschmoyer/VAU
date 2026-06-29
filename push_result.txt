@@ -27,3 +27,47 @@ Untracked files:
 
 no changes added to commit (use "git add" and/or "git commit -a")
 === GIT ADD === 
+warning: in the working copy of 'VastAutoUpdater/ApplicationEvents.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/Services/ConfigManager.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/Services/EmailService.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/Services/InstallerPathService.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/Services/Logger.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/Services/ScheduledTaskService.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/Services/SftpService.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/Services/UpdaterEngine.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/Services/VersionService.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/UI/Form1.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/VastAutoUpdater.vbproj', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'git_output.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'cleanup.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'push_all_fixes.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'push_result.txt', LF will be replaced by CRLF the next time Git touches it
+=== GIT DIFF STAGED === 
+ VastAutoUpdater/ApplicationEvents.vb             |  50 ++++++--
+ VastAutoUpdater/Services/ConfigManager.vb        |  88 ++++++++++++--
+ VastAutoUpdater/Services/EmailService.vb         |  45 +++++--
+ VastAutoUpdater/Services/InstallerPathService.vb |  41 ++++++-
+ VastAutoUpdater/Services/Logger.vb               |  94 ++++++++++++---
+ VastAutoUpdater/Services/ScheduledTaskService.vb |  52 ++++++--
+ VastAutoUpdater/Services/SftpService.vb          | 106 ++++++++++-------
+ VastAutoUpdater/Services/UpdaterEngine.vb        | 145 ++++++++++++++++++++---
+ VastAutoUpdater/Services/VersionService.vb       |  28 +++--
+ VastAutoUpdater/UI/Form1.vb                      | 100 +++++++++-------
+ VastAutoUpdater/VastAutoUpdater.vbproj           |   2 +-
+ cleanup.bat                                      |   6 +
+ cleanup_result.txt                               |   1 +
+ git_output.txt                                   |  10 ++
+ push_all_fixes.bat                               |  13 ++
+ push_result.txt                                  |  29 +++++
+ 16 files changed, 644 insertions(+), 166 deletions(-)
+=== GIT COMMIT === 
+[main 533f08a] fix: comprehensive hardening - logging, error handling, security, retry logic
+ 16 files changed, 644 insertions(+), 166 deletions(-)
+ create mode 100644 cleanup.bat
+ create mode 100644 cleanup_result.txt
+ create mode 100644 push_all_fixes.bat
+ create mode 100644 push_result.txt
+=== GIT PUSH === 
+To https://github.com/kayleschmoyer/VAU.git
+   56d8ac5..533f08a  main -> main
+=== DONE === 

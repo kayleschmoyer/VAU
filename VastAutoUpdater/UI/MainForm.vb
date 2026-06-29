@@ -28,7 +28,6 @@ Public Class MainForm
             Me.ShowInTaskbar = False
             Me.Opacity = 0
             Logger.Log("Starting in silent mode", Logger.LogLevel.Info)
-            RunSilentUpdate()
         End If
     End Sub
 
@@ -75,34 +74,6 @@ Public Class MainForm
             e.Graphics.FillRectangle(brush, pnl.ClientRectangle)
         End Using
     End Sub
-
-    ' ── Rounded panel ────────────────────────────────────────────────
-
-    Private Sub PaintRoundedPanel(sender As Object, e As PaintEventArgs)
-        Dim pnl As Panel = DirectCast(sender, Panel)
-        Dim rect As New Rectangle(0, 0, pnl.Width - 1, pnl.Height - 1)
-        Dim radius As Integer = 8
-        Using path As GraphicsPath = RoundedRect(rect, radius)
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias
-            Using brush As New SolidBrush(BiscuitWhite)
-                e.Graphics.FillPath(brush, path)
-            End Using
-            Using pen As New Pen(Color.FromArgb(220, 220, 215), 1)
-                e.Graphics.DrawPath(pen, path)
-            End Using
-        End Using
-    End Sub
-
-    Private Shared Function RoundedRect(rect As Rectangle, radius As Integer) As GraphicsPath
-        Dim path As New GraphicsPath()
-        Dim d As Integer = radius * 2
-        path.AddArc(rect.X, rect.Y, d, d, 180, 90)
-        path.AddArc(rect.Right - d, rect.Y, d, d, 270, 90)
-        path.AddArc(rect.Right - d, rect.Bottom - d, d, d, 0, 90)
-        path.AddArc(rect.X, rect.Bottom - d, d, d, 90, 90)
-        path.CloseFigure()
-        Return path
-    End Function
 
     ' ── Window drag ──────────────────────────────────────────────────
 
@@ -152,6 +123,12 @@ Public Class MainForm
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs)
         Try
+            ' Encrypt plaintext credentials on first run
+            ConfigManager.EncryptOnFirstRun()
+
+            ' Trim log file to prevent unbounded growth
+            Logger.TrimLogFile()
+
             Dim exePath As String = VersionService.FindVastExecutable()
             If Not String.IsNullOrEmpty(exePath) Then
                 Dim version As String = VersionService.GetFileVersion(exePath)
@@ -164,6 +141,11 @@ Public Class MainForm
             Logger.Log($"Error on load: {ex.Message}", Logger.LogLevel.Error)
             lblStatus.Text = "Error during load"
         End Try
+
+        ' Start silent update after form handle exists and message loop is running
+        If runSilently Then
+            RunSilentUpdate()
+        End If
     End Sub
 
     ' ── Update logic ─────────────────────────────────────────────────

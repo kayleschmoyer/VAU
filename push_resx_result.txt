@@ -1,0 +1,11 @@
+=== RESX FIX PUSH === 
+=== DIFF === 
+ VastAutoUpdater/UI/MainForm.resx | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+=== COMMIT === 
+[main 7704e2e] fix: repair truncated MainForm.resx closing tags
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+=== PUSH === 
+To https://github.com/kayleschmoyer/VAU.git
+   c693185..7704e2e  main -> main
+=== DONE === 

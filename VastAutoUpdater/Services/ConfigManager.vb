@@ -68,7 +68,7 @@ Public Module ConfigManager
     ''' <summary>
     ''' Safely retrieve a string setting with a default fallback.
     ''' </summary>
-    Private Function GetSetting(key As String, defaultValue As String) As String
+    Public Function GetSetting(key As String, defaultValue As String) As String
         Try
             Dim value As String = ConfigurationManager.AppSettings(key)
             Return If(String.IsNullOrEmpty(value), defaultValue, value)
@@ -76,6 +76,24 @@ Public Module ConfigManager
             Return defaultValue
         End Try
     End Function
+
+    ''' <summary>
+    ''' Save a setting value to App.config.
+    ''' </summary>
+    Public Sub SaveSetting(key As String, value As String)
+        Try
+            Dim config As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None)
+            If config.AppSettings.Settings(key) Is Nothing Then
+                config.AppSettings.Settings.Add(key, value)
+            Else
+                config.AppSettings.Settings(key).Value = value
+            End If
+            config.Save(ConfigurationSaveMode.Modified)
+            ConfigurationManager.RefreshSection("appSettings")
+        Catch ex As Exception
+            Logger.Log($"Failed to save setting '{key}': {ex.Message}", Logger.LogLevel.Warning)
+        End Try
+    End Sub
 
     ''' <summary>
     ''' Safely retrieve an integer setting with a default fallback.
@@ -127,5 +145,39 @@ Public Module ConfigManager
         Dim encryptedBytes As Byte() = ProtectedData.Protect(plaintextBytes, Nothing, DataProtectionScope.LocalMachine)
         Return ENCRYPTED_PREFIX & Convert.ToBase64String(encryptedBytes)
     End Function
+
+    ''' <summary>
+    ''' On first run, encrypt any plaintext credential values in App.config using DPAPI.
+    ''' Already-encrypted values (prefixed with "enc:") are left unchanged.
+    ''' </summary>
+    Public Sub EncryptOnFirstRun()
+        Dim credentialKeys As String() = {"SftpUsername", "SftpPassword", "SmtpUsername", "SmtpPassword"}
+        Dim needsSave As Boolean = False
+
+        Try
+            Dim config As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None)
+
+            For Each key As String In credentialKeys
+                Dim setting As KeyValueConfigurationElement = config.AppSettings.Settings(key)
+                If setting Is Nothing Then Continue For
+                Dim raw As String = setting.Value
+                If String.IsNullOrEmpty(raw) Then Continue For
+                If raw.StartsWith(ENCRYPTED_PREFIX) Then Continue For
+
+                ' Plaintext value found — encrypt it
+                setting.Value = EncryptValue(raw)
+                needsSave = True
+                Logger.Log($"Encrypted credential: {key}", Logger.LogLevel.Info)
+            Next
+
+            If needsSave Then
+                config.Save(ConfigurationSaveMode.Modified)
+                ConfigurationManager.RefreshSection("appSettings")
+                Logger.Log("App.config credentials encrypted via DPAPI", Logger.LogLevel.Info)
+            End If
+        Catch ex As Exception
+            Logger.Log($"Failed to encrypt credentials on first run: {ex.Message}", Logger.LogLevel.Warning)
+        End Try
+    End Sub
 
 End Module

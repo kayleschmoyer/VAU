@@ -130,3 +130,12 @@ C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.exe
 C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.xml
 C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAutoUpdater.pdb
 C:\WorkProjects\VastAutoUpdater\VastAutoUpdater\obj\Debug\VastAuto.1C402AED.Up2Date
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAutoUpdater.vbproj.AssemblyReference.cache
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAutoUpdater.Resources.resources
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAutoUpdater.vbproj.GenerateResource.cache
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAutoUpdater.vbproj.CoreCompileInputs.cache
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAutoUpdater.exe
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAutoUpdater.xml
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAutoUpdater.pdb
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAuto.1C402AED.Up2Date
+C:\Projects\AutoUpdate\VastAutoUpdater\obj\Debug\VastAutoUpdater.MainForm.resources

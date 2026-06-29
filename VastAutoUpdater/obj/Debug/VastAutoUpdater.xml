@@ -6,6 +6,18 @@ VastAutoUpdater
 </name>
 </assembly>
 <members>
+<member name="M:VastAutoUpdater.My.MyApplication.MyApplication_UnhandledException(System.Object,Microsoft.VisualBasic.ApplicationServices.UnhandledExceptionEventArgs)">
+ <summary>
+ Global handler for any unhandled exception in the application.
+ Logs the error to the file-based logger and exits gracefully
+ instead of crashing with a raw exit code.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.My.MyApplication.MyApplication_Startup(System.Object,Microsoft.VisualBasic.ApplicationServices.StartupEventArgs)">
+ <summary>
+ Application startup — trim log file and log session start.
+ </summary>
+</member>
 <member name="T:VastAutoUpdater.My.Resources.Resources">
 <summary>
   A strongly-typed resource class, for looking up localized strings, etc.
@@ -21,6 +33,155 @@ VastAutoUpdater
   Overrides the current thread's CurrentUICulture property for all
   resource lookups using this strongly typed resource class.
 </summary>
+</member>
+<member name="M:VastAutoUpdater.MainForm.ApplyBranding">
+ <summary>
+ Apply brand styling and gradient painting.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.MainForm.SetProgressBarColor">
+ <summary>
+ Apply magenta color to the progress bar via SendMessage PBM_SETBARCOLOR.
+ </summary>
+</member>
+<member name="T:VastAutoUpdater.Logger">
+ <summary>
+ Logging wrapper that writes to both Windows Event Log and a fallback file log.
+ If Event Log is unavailable (source not registered, permissions), the file log
+ ensures diagnostics are never lost.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.Logger.TrimLogFile(System.Int64)">
+ <summary>
+ Trim log file if it exceeds maxSizeBytes. Keeps the most recent entries.
+ Called at startup to prevent unbounded growth.
+ </summary>
+</member>
+<member name="T:VastAutoUpdater.ConfigManager">
+ <summary>
+ Centralized access to application configuration values from App.config.
+ Provides safe parsing with defaults, and DPAPI encryption support for credentials.
+ On first access, plaintext credentials are automatically encrypted in-place.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.ConfigManager.GetSetting(System.String,System.String)">
+ <summary>
+ Safely retrieve a string setting with a default fallback.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.ConfigManager.GetSettingInt(System.String,System.Int32)">
+ <summary>
+ Safely retrieve an integer setting with a default fallback.
+ Uses TryParse to avoid exceptions on malformed values.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.ConfigManager.GetProtectedSetting(System.String,System.String)">
+ <summary>
+ Retrieve a credential setting, handling DPAPI encryption transparently.
+ If the value is plaintext, it works as-is (backward compatible).
+ If prefixed with "enc:", it is decrypted via DPAPI (machine scope).
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.ConfigManager.EncryptValue(System.String)">
+ <summary>
+ Encrypt a plaintext credential value using DPAPI (machine scope).
+ Returns the "enc:" prefixed base64 string suitable for App.config.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.SftpService.CreateClient(System.String,System.String)">
+ <summary>
+ Create a configured SftpClient with proper timeouts.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.SftpService.GetLatestVersion(System.String,System.String,System.String)">
+ <summary>
+ Query the SFTP server for the latest version matching the given major.minor prefix.
+ Returns "0.0.0" if no matching version is found or on error.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.SftpService.DownloadFile(System.String,System.String,System.String,System.String,System.Action{System.UInt64})">
+ <summary>
+ Download the installer for the specified version to localPath.
+ Returns True on success, False on failure.
+ </summary>
+</member>
+<member name="T:VastAutoUpdater.EmailService">
+ <summary>
+ Service for sending SMTP notification emails.
+ Credentials and host information are read from <see cref="T:VastAutoUpdater.ConfigManager"/>.
+ All exceptions are caught and logged — email failures never crash the app.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.EmailService.SendSummary(System.Boolean,System.String,System.Exception)">
+ <summary>
+ Send an email summarizing the update process result.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.UpdaterEngine.PerformUpdateCheck(System.String,System.String,System.Action{System.Int32,System.String})">
+ <summary>
+ Perform the update workflow with retry logic and send a summary email.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.UpdaterEngine.RetryOperation``1(System.Func{``0},System.String)">
+ <summary>
+ Retry an operation up to MAX_RETRIES times with delay between attempts.
+ </summary>
+</member>
+<member name="T:VastAutoUpdater.VersionService">
+ <summary>
+ Utility methods for locating VAST.exe and obtaining version information.
+ Caches the discovered path to avoid repeated full-drive scans.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.VersionService.FindVastExecutable">
+ <summary>
+ Search all drives for the VAST executable. Result is cached after first discovery.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.VersionService.GetFileVersion(System.String)">
+ <summary>
+ Return the product version string of the provided file.
+ Returns "0.0.0" if the file is missing or version cannot be read.
+ </summary>
+</member>
+<member name="T:VastAutoUpdater.InstallerPathService">
+ <summary>
+ Helper methods related to installer storage paths.
+ Manages the %ProgramData%\VASTUpdater\NewPatchInstall directory.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.InstallerPathService.EnsureUpdateFolderExists">
+ <summary>
+ Ensure the update folder exists in ProgramData.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.InstallerPathService.GetInstallPath(System.String)">
+ <summary>
+ Build the full path for a downloaded installer version.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.InstallerPathService.CleanupOldInstallers(System.String)">
+ <summary>
+ Remove old installer files, keeping only the current version.
+ Prevents ProgramData from accumulating stale installers.
+ </summary>
+</member>
+<member name="T:VastAutoUpdater.ScheduledTaskService">
+ <summary>
+ Encapsulates creation of Windows scheduled tasks for running the updater.
+ Uses schtasks.exe directly (not via cmd.exe) to avoid command injection.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.ScheduledTaskService.CreateTask">
+ <summary>
+ Create a weekly scheduled task that runs the updater silently.
+ Calls schtasks.exe directly with proper argument quoting.
+ </summary>
+</member>
+<member name="M:VastAutoUpdater.ScheduledTaskService.TaskExists">
+ <summary>
+ Check if the scheduled task already exists.
+ </summary>
 </member>
 </members>
 </doc>

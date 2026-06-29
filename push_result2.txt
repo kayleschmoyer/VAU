@@ -1,0 +1,14 @@
+=== CLEANUP AND PUSH === 
+fatal: pathspec 'done.txt' did not match any files
+warning: in the working copy of 'VastAutoUpdater/VastAutoUpdater.vbproj', LF will be replaced by CRLF the next time Git touches it
+=== DIFF === 
+ VastAutoUpdater.sln                    |  2 +-
+ VastAutoUpdater/VastAutoUpdater.vbproj | 22 +++++++++++-----------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+=== COMMIT === 
+[main abb77fe] fix: correct .sln project path and .vbproj backslashes, remove temp files
+ 2 files changed, 12 insertions(+), 12 deletions(-)
+=== PUSH === 
+To https://github.com/kayleschmoyer/VAU.git
+   533f08a..abb77fe  main -> main
+=== DONE === 

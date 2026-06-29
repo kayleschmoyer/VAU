@@ -87,10 +87,10 @@ Public Module Logger
             Dim fi As New FileInfo(LogFilePath)
             If fi.Length <= maxSizeBytes Then Return
 
-            Dim lines = File.ReadAllLines(LogFilePath)
-            ' Keep the last half of lines
-            Dim keepFrom As Integer = lines.Length \ 2
             SyncLock LogLock
+                ' Read and write inside the same lock to prevent lost writes
+                Dim lines = File.ReadAllLines(LogFilePath)
+                Dim keepFrom As Integer = lines.Length \ 2
                 File.WriteAllLines(LogFilePath, lines.Skip(keepFrom).ToArray())
             End SyncLock
             Log("Log file trimmed to stay under size limit", LogLevel.Info)

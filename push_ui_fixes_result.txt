@@ -1,0 +1,16 @@
+=== UI FIXES PUSH === 
+warning: in the working copy of 'VastAutoUpdater/Services/UpdaterEngine.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/UI/MainForm.Designer.vb', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'VastAutoUpdater/UI/MainForm.vb', LF will be replaced by CRLF the next time Git touches it
+=== DIFF === 
+ VastAutoUpdater/Services/UpdaterEngine.vb |  5 +++++
+ VastAutoUpdater/UI/MainForm.Designer.vb   | 28 ++++++++++++++--------------
+ VastAutoUpdater/UI/MainForm.vb            | 13 +------------
+ 3 files changed, 20 insertions(+), 26 deletions(-)
+=== COMMIT === 
+[main 74e81b2] fix: error handling, header size, credential panel styling
+ 3 files changed, 20 insertions(+), 26 deletions(-)
+=== PUSH === 
+To https://github.com/kayleschmoyer/VAU.git
+   7704e2e..74e81b2  main -> main
+=== DONE === 
