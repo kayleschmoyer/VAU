@@ -131,7 +131,7 @@ Public Class MainForm
         Me.WindowState = FormWindowState.Minimized
     End Sub
 
-    ' ── Progress bar color hack ──────────────────────────────────────
+    ' -- Progress bar color hack --
     ''' <summary>
     ''' Apply magenta color to the progress bar via SendMessage PBM_SETBARCOLOR.
     ''' </summary>
@@ -183,7 +183,7 @@ Public Class MainForm
     ''' </summary>
     Private Async Sub BtnCheckForUpdates_Click(sender As Object, e As EventArgs)
         If updateCts IsNot Nothing Then
-            ' Cancel in progress — disable button briefly to prevent double-cancel
+            ' Cancel in progress -- disable button briefly to prevent double-cancel
             btnCheckForUpdates.Enabled = False
             updateCts.Cancel()
             btnCheckForUpdates.Enabled = True
@@ -255,4 +255,96 @@ Public Class MainForm
                     If runSilently Then Return
                     Try
                         Me.Invoke(Sub()
-                                      lblStatus.Text = st
+                                      lblStatus.Text = status
+                                      progressBar1.Value = Math.Min(Math.Max(p, 0), 100)
+                                      progressBar1.Invalidate()
+                                  End Sub)
+                    Catch
+                        ' Form may be disposed during exit
+                    End Try
+                End Sub, cancelToken)
+
+            If Not runSilently Then
+                Try
+                    Me.Invoke(Sub()
+                                  lblStatus.Text = "Update complete."
+                                  lblStatus.ForeColor = Color.FromArgb(0, 150, 80)
+                                  pnlProgress.Visible = False
+                              End Sub)
+                Catch
+                    ' Form may be disposed during exit
+                End Try
+                Logger.Log("Update completed in UI mode.", Logger.LogLevel.Info)
+            End If
+
+        Catch ex As OperationCanceledException
+            Logger.Log("Update check cancelled by user", Logger.LogLevel.Info)
+            If Not runSilently Then
+                Try
+                    Me.Invoke(Sub()
+                                  lblStatus.Text = "Update check cancelled."
+                                  lblStatus.ForeColor = Charcoal
+                                  pnlProgress.Visible = False
+                              End Sub)
+                Catch
+                End Try
+            End If
+
+        Catch ex As UpdateException
+            Logger.Log($"Update failed [{ex.ErrorCode}]: {ex.Message}", Logger.LogLevel.Error)
+
+            If Not runSilently Then
+                Try
+                    Me.Invoke(Sub()
+                                  lblStatus.Text = $"Error [{ex.ErrorCode}]: {ex.Message}"
+                                  lblStatus.ForeColor = Color.FromArgb(200, 0, 0)
+                                  pnlProgress.Visible = False
+                              End Sub)
+                Catch
+                End Try
+            End If
+
+            If runSilently Then Throw
+
+        Catch ex As Exception
+            Logger.Log($"Update failed: {ex.Message}", Logger.LogLevel.Error)
+
+            If Not runSilently Then
+                Try
+                    Me.Invoke(Sub()
+                                  lblStatus.Text = $"Error: {ex.Message}"
+                                  lblStatus.ForeColor = Color.FromArgb(200, 0, 0)
+                                  pnlProgress.Visible = False
+                              End Sub)
+                Catch
+                End Try
+            End If
+
+            If runSilently Then Throw
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' Cancel any in-progress update and log application closure.
+    ''' </summary>
+    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs)
+        If updateCts IsNot Nothing Then
+            updateCts.Cancel()
+            Logger.Log("Cancelled in-progress update due to form closing", Logger.LogLevel.Info)
+        End If
+        Logger.Log("Application closing", Logger.LogLevel.Info)
+    End Sub
+
+    ''' <summary>
+    ''' Log and exit the application with the specified exit code.
+    ''' </summary>
+    ''' <param name="exitCode">Process exit code (0 = success, non-zero = failure).</param>
+    Private Sub ExitApplication(exitCode As Integer)
+        Logger.Log($"Application exiting with code {exitCode}", Logger.LogLevel.Info)
+        If exitCode <> 0 Then
+            Environment.ExitCode = exitCode
+        End If
+        Application.Exit()
+    End Sub
+
+End Class

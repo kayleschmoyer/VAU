@@ -65,6 +65,7 @@
     <Compile Include="Tests\ConfigManagerTests.vb" />
     <Compile Include="Tests\LoggerTests.vb" />
     <Compile Include="Tests\UpdateExceptionTests.vb" />
+    <Compile Include="Tests\UpdaterEngineTests.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VastAutoUpdater\VastAutoUpdater.vbproj">
@@ -73,6 +74,4 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuild
+    <None Include="packages.

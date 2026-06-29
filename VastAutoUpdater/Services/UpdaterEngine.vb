@@ -9,9 +9,26 @@ Imports System.Threading
 ''' and installer integrity verification.
 ''' </summary>
 Public Class UpdaterEngine
-    Private ReadOnly email As New EmailService()
+    Private ReadOnly _emailService As IEmailService
+    Private ReadOnly _sftpFactory As Func(Of ISftpService)
     Private Const MAX_RETRIES As Integer = 3
     Private Const RETRY_DELAY_MS As Integer = 5000
+
+    ''' <summary>
+    ''' Create an UpdaterEngine with default production services.
+    ''' </summary>
+    Public Sub New()
+        _emailService = New EmailService()
+        _sftpFactory = Function() New SftpService()
+    End Sub
+
+    ''' <summary>
+    ''' Create an UpdaterEngine with injected dependencies for testing.
+    ''' </summary>
+    Public Sub New(emailService As IEmailService, sftpFactory As Func(Of ISftpService))
+        _emailService = emailService
+        _sftpFactory = sftpFactory
+    End Sub
 
     ''' <summary>
     ''' Perform the update workflow with retry logic and send a summary email.
@@ -21,7 +38,7 @@ Public Class UpdaterEngine
         Dim message As String = String.Empty
         Dim caughtEx As Exception = Nothing
 
-        Using sftp As New SftpService()
+        Using sftp As ISftpService = _sftpFactory()
             Try
                 Logger.Log("Running update check", Logger.LogLevel.Info)
                 progress(5, "Locating VAST installation...")
@@ -165,7 +182,7 @@ Public Class UpdaterEngine
 
         ' Send summary email
         Try
-            Await Task.Run(Sub() email.SendSummary(success, message, caughtEx))
+            Await Task.Run(Sub() _emailService.SendSummary(success, message, caughtEx))
         Catch emailEx As Exception
             Logger.Log($"Failed to send summary email: {emailEx.Message}", Logger.LogLevel.Warning)
         End Try
@@ -183,7 +200,7 @@ Public Class UpdaterEngine
     ''' Verify installer integrity using a SHA-256 hash sidecar file (.sha256).
     ''' If no sidecar exists on the server, logs a warning and continues.
     ''' </summary>
-    Private Async Function VerifyInstallerHash(sftp As SftpService, version As String, localPath As String) As Task
+    Private Async Function VerifyInstallerHash(sftp As ISftpService, version As String, localPath As String) As Task
         Try
             Dim hashFileName As String = $"{version}.exe.sha256"
             Dim hashSize As Long = Await Task.Run(Function() sftp.GetRemoteFileSize(hashFileName))
@@ -222,18 +239,4 @@ Public Class UpdaterEngine
             ' Clean up hash file
             Try
                 File.Delete(hashPath)
-            Catch
-            End Try
-        Catch ex As UpdateException
-            Throw ' Re-throw hash mismatch
-        Catch ex As Exception
-            Logger.Log($"Hash verification skipped: {ex.Message}", Logger.LogLevel.Warning)
-        End Try
-    End Function
-
-    ''' <summary>
-    ''' Retry an async operation up to MAX_RETRIES times with Task.Delay between attempts.
-    ''' Does not block thread pool threads.
-    ''' </summary>
-    Private Async Function RetryOperationAsync(Of T)(operation As Func(Of Task(Of T)), operationName As String) As Task(Of T)
-        Dim lastEx As Exception = Noth
+            

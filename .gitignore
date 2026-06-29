@@ -10,3 +10,11 @@ obj/
 
 # Security
 *.pfx
+
+# NuGet packages
+*.nupkg
+*.snupkg
+
+# Local scripts and temp files
+*.bat
+*.tmp

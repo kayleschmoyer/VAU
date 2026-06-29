@@ -6,11 +6,12 @@ Imports System.Net.Mail
 ''' All exceptions are caught and logged — email failures never crash the app.
 ''' </summary>
 Public Class EmailService
+    Implements IEmailService
 
     ''' <summary>
     ''' Send an email summarizing the update process result.
     ''' </summary>
-    Public Sub SendSummary(success As Boolean, details As String, Optional exception As Exception = Nothing)
+    Public Sub SendSummary(success As Boolean, details As String, Optional exception As Exception = Nothing) Implements IEmailService.SendSummary
         Try
             Dim emailTo As String = ConfigManager.EmailTo
             Dim emailFrom As String = ConfigManager.EmailFrom
@@ -64,6 +65,4 @@ Public Class EmailService
                     client.Timeout = 30000 ' 30 second timeout
                     client.Send(msg)
                 End Using
-            End Using
-
-            Logger.Log($"Notification email sent: 
+       

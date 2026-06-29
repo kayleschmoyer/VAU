@@ -8,7 +8,7 @@ Imports System.Linq
 ''' Uses a single connection per update cycle, verifies host keys, and disconnects properly.
 ''' </summary>
 Public Class SftpService
-    Implements IDisposable
+    Implements ISftpService
 
     Private ReadOnly host As String = ConfigManager.SftpHost
     Private ReadOnly remoteDir As String = "/VASTAutoInstall/"
@@ -31,7 +31,7 @@ Public Class SftpService
     ''' Connect to the SFTP server with host key verification.
     ''' Reuses the existing connection if already connected.
     ''' </summary>
-    Public Sub Connect(username As String, password As String)
+    Public Sub Connect(username As String, password As String) Implements ISftpService.Connect
         If client IsNot Nothing AndAlso client.IsConnected Then Return
 
         If String.IsNullOrWhiteSpace(host) Then
@@ -84,7 +84,7 @@ Public Class SftpService
     ''' <summary>
     ''' Disconnect from the server cleanly.
     ''' </summary>
-    Public Sub Disconnect()
+    Public Sub Disconnect() Implements ISftpService.Disconnect
         If client IsNot Nothing AndAlso client.IsConnected Then
             Try
                 client.Disconnect()
@@ -100,7 +100,7 @@ Public Class SftpService
     ''' Returns "0.0.0" if no matching version is found.
     ''' Must call Connect() first.
     ''' </summary>
-    Public Function GetLatestVersion(prefix As String) As String
+    Public Function GetLatestVersion(prefix As String) As String Implements ISftpService.GetLatestVersion
         EnsureConnected()
         Dim files = client.ListDirectory(remoteDir).
             Where(Function(f) f.IsRegularFile AndAlso f.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
@@ -130,13 +130,17 @@ Public Class SftpService
     ''' Pass the full filename (e.g., "1.2.3.exe" or "1.2.3.sha256").
     ''' Returns 0 if the file doesn't exist.
     ''' </summary>
-    Public Function GetRemoteFileSize(remoteFileName As String) As Long
+    Public Function GetRemoteFileSize(remoteFileName As String) As Long Implements ISftpService.GetRemoteFileSize
         EnsureConnected()
         Try
             Dim remotePath As String = $"{remoteDir}{remoteFileName}"
             Dim attrs = client.GetAttributes(remotePath)
             Return attrs.Size
-        Catch
+        Catch ex As SftpPathNotFoundException
+            Logger.Log($"Remote file not found: {remoteFileName}", Logger.LogLevel.Info)
+            Return 0
+        Catch ex As Exception
+            Logger.Log($"Error checking remote file size for {remoteFileName}: {ex.Message}", Logger.LogLevel.Warning)
             Return 0
         End Try
     End Function
@@ -147,7 +151,7 @@ Public Class SftpService
     ''' Returns True on success, False on failure.
     ''' Must call Connect() first.
     ''' </summary>
-    Public Function DownloadFile(remoteFileName As String, localPath As String, progress As Action(Of ULong)) As Boolean
+    Public Function DownloadFile(remoteFileName As String, localPath As String, progress As Action(Of ULong)) As Boolean Implements ISftpService.DownloadFile
         EnsureConnected()
         Dim remotePath As String = $"{remoteDir}{remoteFileName}"
         Dim tempPath As String = localPath & ".tmp"
@@ -163,16 +167,4 @@ Public Class SftpService
             Dim fi As New FileInfo(tempPath)
             If Not fi.Exists OrElse fi.Length = 0 Then
                 Logger.Log($"Download produced empty file: {tempPath}", Logger.LogLevel.Error)
-                Return False
-            End If
-
-            ' Atomic rename: delete target if it exists, then move temp into place
-            If File.Exists(localPath) Then File.Delete(localPath)
-            File.Move(tempPath, localPath)
-
-            Logger.Log($"Download completed: {localPath} ({fi.Length} bytes)", Logger.LogLevel.Info)
-            Return True
-        Catch ex As Exception
-            ' Clean up partial download on failure
-            Try
-                If File.E
+          
