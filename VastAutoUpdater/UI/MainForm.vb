@@ -11,7 +11,7 @@ Public Class MainForm
     Private Shared ReadOnly Magenta As Color = Color.FromArgb(237, 1, 127)
     Private Shared ReadOnly MagentaDark As Color = Color.FromArgb(180, 0, 96)
     Private Shared ReadOnly Charcoal As Color = Color.FromArgb(51, 51, 51)
-    Private Shared ReadOnly BiscuitWhite As Color = Color.FromArgb(242, 243, 239)
+
 
     Public Sub New()
         InitializeComponent()
@@ -212,11 +212,15 @@ Public Class MainForm
                 End Sub)
 
             If Not runSilently Then
-                Me.Invoke(Sub()
-                              lblStatus.Text = "Update complete."
-                              lblStatus.ForeColor = Color.FromArgb(0, 150, 80)
-                              pnlProgress.Visible = False
-                          End Sub)
+                Try
+                    Me.Invoke(Sub()
+                                  lblStatus.Text = "Update complete."
+                                  lblStatus.ForeColor = Color.FromArgb(0, 150, 80)
+                                  pnlProgress.Visible = False
+                              End Sub)
+                Catch
+                    ' Form may be disposed during exit
+                End Try
                 Logger.Log("Update completed in UI mode.", Logger.LogLevel.Info)
             End If
 
@@ -246,8 +250,4 @@ Public Class MainForm
         Logger.Log($"Application exiting with code {exitCode}", Logger.LogLevel.Info)
         If exitCode <> 0 Then
             Environment.ExitCode = exitCode
-        End If
-        Application.Exit()
-    End Sub
-
-End Class
+     

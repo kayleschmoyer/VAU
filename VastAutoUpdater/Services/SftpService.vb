@@ -19,6 +19,15 @@ Public Class SftpService
     Private disposed As Boolean = False
 
     ''' <summary>
+    ''' Throw if the client is not connected. Guards public methods that require a session.
+    ''' </summary>
+    Private Sub EnsureConnected()
+        If client Is Nothing OrElse Not client.IsConnected Then
+            Throw New InvalidOperationException("SFTP client is not connected. Call Connect() first.")
+        End If
+    End Sub
+
+    ''' <summary>
     ''' Connect to the SFTP server with host key verification.
     ''' Reuses the existing connection if already connected.
     ''' </summary>
@@ -92,6 +101,7 @@ Public Class SftpService
     ''' Must call Connect() first.
     ''' </summary>
     Public Function GetLatestVersion(prefix As String) As String
+        EnsureConnected()
         Dim files = client.ListDirectory(remoteDir).
             Where(Function(f) f.IsRegularFile AndAlso f.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
 
@@ -121,6 +131,7 @@ Public Class SftpService
     ''' Returns 0 if the file doesn't exist.
     ''' </summary>
     Public Function GetRemoteFileSize(remoteFileName As String) As Long
+        EnsureConnected()
         Try
             Dim remotePath As String = $"{remoteDir}{remoteFileName}"
             Dim attrs = client.GetAttributes(remotePath)
@@ -137,6 +148,7 @@ Public Class SftpService
     ''' Must call Connect() first.
     ''' </summary>
     Public Function DownloadFile(remoteFileName As String, localPath As String, progress As Action(Of ULong)) As Boolean
+        EnsureConnected()
         Dim remotePath As String = $"{remoteDir}{remoteFileName}"
         Dim tempPath As String = localPath & ".tmp"
 
@@ -163,21 +175,4 @@ Public Class SftpService
         Catch ex As Exception
             ' Clean up partial download on failure
             Try
-                If File.Exists(tempPath) Then File.Delete(tempPath)
-            Catch
-            End Try
-            Throw
-        End Try
-    End Function
-
-    Public Sub Dispose() Implements IDisposable.Dispose
-        If Not disposed Then
-            Disconnect()
-            If client IsNot Nothing Then
-                client.Dispose()
-                client = Nothing
-            End If
-            disposed = True
-        End If
-    End Sub
-End Class
+                If File
