@@ -25,10 +25,11 @@ Public Class MainForm
     ''' </summary>
     Public Sub New()
         InitializeComponent()
+        Me.DoubleBuffered = True
         ApplyBranding()
 
         Dim args As String() = Environment.GetCommandLineArgs()
-        runSilently = args.Contains("silent")
+        runSilently = args.Any(Function(a) a.Equals("silent", StringComparison.OrdinalIgnoreCase))
 
         AddHandler Me.Load, AddressOf MainForm_Load
         AddHandler Me.FormClosing, AddressOf MainForm_FormClosing
@@ -182,8 +183,10 @@ Public Class MainForm
     ''' </summary>
     Private Async Sub BtnCheckForUpdates_Click(sender As Object, e As EventArgs)
         If updateCts IsNot Nothing Then
-            ' Cancel in progress
+            ' Cancel in progress — disable button briefly to prevent double-cancel
+            btnCheckForUpdates.Enabled = False
             updateCts.Cancel()
+            btnCheckForUpdates.Enabled = True
             Return
         End If
 
@@ -252,9 +255,4 @@ Public Class MainForm
                     If runSilently Then Return
                     Try
                         Me.Invoke(Sub()
-                                      lblStatus.Text = status
-                                      progressBar1.Value = Math.Min(Math.Max(p, 0), 100)
-                                      progressBar1.Invalidate()
-                                  End Sub)
-                    Catch
-    
+                                      lblStatus.Text = st

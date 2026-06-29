@@ -68,14 +68,14 @@ Public Class SftpService
         Dim storedFingerprint As String = ConfigManager.GetSetting("SftpHostFingerprint", "")
 
         If String.IsNullOrEmpty(storedFingerprint) Then
-            ' First connection — trust on first use, store the fingerprint
+            ' First connection -- trust on first use, store the fingerprint
             ConfigManager.SaveSetting("SftpHostFingerprint", fingerprint)
             Logger.Log($"SFTP host key fingerprint stored: {fingerprint}", Logger.LogLevel.Info)
             e.CanTrust = True
         ElseIf storedFingerprint.Equals(fingerprint, StringComparison.OrdinalIgnoreCase) Then
             e.CanTrust = True
         Else
-            ' Fingerprint mismatch — potential MITM
+            ' Fingerprint mismatch -- potential MITM
             Logger.Log($"SFTP host key mismatch! Expected: {storedFingerprint}, Got: {fingerprint}", Logger.LogLevel.Error)
             e.CanTrust = False
         End If
@@ -175,4 +175,4 @@ Public Class SftpService
         Catch ex As Exception
             ' Clean up partial download on failure
             Try
-                If File
+                If File.E

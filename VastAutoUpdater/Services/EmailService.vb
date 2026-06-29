@@ -50,6 +50,11 @@ Public Class EmailService
                         msg.To.Add(trimmed)
                     End If
                 Next
+                If msg.To.Count = 0 Then
+                    Logger.Log("No valid email recipients — skipping notification", Logger.LogLevel.Warning)
+                    Return
+                End If
+
                 msg.Subject = subject
                 msg.Body = body
 
@@ -61,10 +66,4 @@ Public Class EmailService
                 End Using
             End Using
 
-            Logger.Log($"Notification email sent: {subject}", Logger.LogLevel.Info)
-
-        Catch ex As Exception
-            Logger.Log($"Failed to send notification email: {ex.Message}", Logger.LogLevel.Warning)
-        End Try
-    End Sub
-End Class
+            Logger.Log($"Notification email sent: 

@@ -65,9 +65,7 @@ Public Class UpdaterEngine
 
                 Dim parsedLatest As Version = Nothing
                 If Not Version.TryParse(latest, parsedLatest) Then
-                    message = $"Invalid remote version format: {latest}"
-                    Logger.Log(message, Logger.LogLevel.Warning)
-                    Return
+                    Throw New UpdateException(UpdateErrorCode.VersionParseError, $"Invalid remote version format: {latest}")
                 End If
 
                 If parsedLatest.CompareTo(parsedCurrent) <= 0 Then
@@ -87,7 +85,9 @@ Public Class UpdaterEngine
 
                 ' Get remote file size for accurate progress
                 Dim remoteSize As Long = Await Task.Run(Function() sftp.GetRemoteFileSize($"{latest}.exe"))
-                If remoteSize <= 0 Then remoteSize = 1 ' avoid division by zero
+                If remoteSize <= 0 Then
+                    Throw New UpdateException(UpdateErrorCode.DownloadFailed, $"Remote installer file not found: {latest}.exe")
+                End If
 
                 Dim downloadOk As Boolean = Await Task.Run(
                     Function() sftp.DownloadFile($"{latest}.exe", installer,
@@ -150,6 +150,9 @@ Public Class UpdaterEngine
 
                 progress(100, "Update complete.")
 
+            Catch ex As OperationCanceledException
+                ' Let cancellation propagate directly — do not wrap or email
+                Throw
             Catch ex As Exception
                 caughtEx = ex
                 Logger.Log($"Update error: {ex.Message}", Logger.LogLevel.Error)
@@ -233,11 +236,4 @@ Public Class UpdaterEngine
     ''' Does not block thread pool threads.
     ''' </summary>
     Private Async Function RetryOperationAsync(Of T)(operation As Func(Of Task(Of T)), operationName As String) As Task(Of T)
-        Dim lastEx As Exception = Nothing
-        For attempt As Integer = 1 To MAX_RETRIES
-            Dim shouldDelay As Boolean = False
-            Try
-                Return Await operation()
-            Catch ex As Exception
-                lastEx = ex
-   
+        Dim lastEx As Exception = Noth
