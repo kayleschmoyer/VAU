@@ -3,40 +3,63 @@ Imports System.Net.Mail
 ''' <summary>
 ''' Service for sending SMTP notification emails.
 ''' Credentials and host information are read from <see cref="ConfigManager"/>.
+''' All exceptions are caught and logged — email failures never crash the app.
 ''' </summary>
 Public Class EmailService
 
     ''' <summary>
     ''' Send an email summarizing the update process result.
     ''' </summary>
-    ''' <param name="success">Whether the update succeeded.</param>
-    ''' <param name="details">Extra details about the update.</param>
-    ''' <param name="exception">Optional exception if the update failed.</param>
     Public Sub SendSummary(success As Boolean, details As String, Optional exception As Exception = Nothing)
         Try
-            Dim subject As String = If(success, "Update Success", "Update Failure")
-            Dim body As String = $"Time: {DateTime.Now}\nResult: {subject}\nDetails: {details}"
+            Dim emailTo As String = ConfigManager.EmailTo
+            Dim emailFrom As String = ConfigManager.EmailFrom
+            Dim smtpHost As String = ConfigManager.SmtpHost
+
+            ' Validate required email config before attempting send
+            If String.IsNullOrWhiteSpace(emailTo) OrElse
+               String.IsNullOrWhiteSpace(emailFrom) OrElse
+               String.IsNullOrWhiteSpace(smtpHost) Then
+                Logger.Log("Email configuration incomplete — skipping notification", Logger.LogLevel.Warning)
+                Return
+            End If
+
+            Dim subject As String = If(success, "VAST Update Success", "VAST Update Failure")
+            Dim body As String = $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss}" & vbCrLf &
+                                 $"Machine: {Environment.MachineName}" & vbCrLf &
+                                 $"Result: {subject}" & vbCrLf &
+                                 $"Details: {details}"
+
             If Not success AndAlso exception IsNot Nothing Then
-                body &= $"\nException: {exception.Message}"
+                body &= vbCrLf & $"Exception: {exception.Message}"
+                If exception.StackTrace IsNot Nothing Then
+                    body &= vbCrLf & $"Stack Trace: {exception.StackTrace}"
+                End If
             End If
 
             Using msg As New MailMessage()
-                msg.From = New MailAddress(ConfigManager.EmailFrom)
-                For Each addr In ConfigManager.EmailTo.Split(";"c)
-                    If Not String.IsNullOrWhiteSpace(addr) Then msg.To.Add(addr)
+                msg.From = New MailAddress(emailFrom)
+                For Each addr As String In emailTo.Split(";"c)
+                    Dim trimmed As String = addr.Trim()
+                    If Not String.IsNullOrWhiteSpace(trimmed) Then
+                        msg.To.Add(trimmed)
+                    End If
                 Next
                 msg.Subject = subject
                 msg.Body = body
 
-                Using client As New SmtpClient(ConfigManager.SmtpHost, ConfigManager.SmtpPort)
+                Using client As New SmtpClient(smtpHost, ConfigManager.SmtpPort)
                     client.Credentials = New Net.NetworkCredential(ConfigManager.SmtpUsername, ConfigManager.SmtpPassword)
                     client.EnableSsl = True
+                    client.Timeout = 30000 ' 30 second timeout
                     client.Send(msg)
                 End Using
             End Using
+
             Logger.Log($"Notification email sent: {subject}", Logger.LogLevel.Info)
+
         Catch ex As Exception
-            Logger.Log($"Failed to send notification email: {ex.Message}", Logger.LogLevel.Error)
+            Logger.Log($"Failed to send notification email: {ex.Message}", Logger.LogLevel.Warning)
         End Try
     End Sub
 End Class

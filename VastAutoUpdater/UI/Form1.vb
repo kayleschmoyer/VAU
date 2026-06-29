@@ -16,12 +16,16 @@ Public Class VASTUpdater
         InitializeComponent()
         InitializeUX()
 
-        Dim args = Environment.GetCommandLineArgs()
+        Dim args As String() = Environment.GetCommandLineArgs()
         runSilently = args.Contains("silent")
 
         AddHandler Me.Load, AddressOf VASTUpdater_Load
 
         If runSilently Then
+            ' Hide the form entirely in silent mode — no UI flash
+            Me.WindowState = FormWindowState.Minimized
+            Me.ShowInTaskbar = False
+            Me.Opacity = 0
             Logger.Log("Starting in silent mode", Logger.LogLevel.Info)
             RunSilentUpdate()
         End If
@@ -29,9 +33,9 @@ Public Class VASTUpdater
 
     Private Sub VASTUpdater_Load(sender As Object, e As EventArgs)
         Try
-            Dim exePath = VersionService.FindVastExecutable()
+            Dim exePath As String = VersionService.FindVastExecutable()
             If Not String.IsNullOrEmpty(exePath) Then
-                Dim version = VersionService.GetFileVersion(exePath)
+                Dim version As String = VersionService.GetFileVersion(exePath)
                 lblCurrentVersion.Text = $"Current Version: {version}"
             Else
                 lblCurrentVersion.Text = "Current Version: Not Found"
@@ -90,10 +94,14 @@ Public Class VASTUpdater
     End Sub
 
     Private Async Sub RunSilentUpdate()
-        Await RunUpdate()
-
-        Logger.Log("Silent mode finished, exiting", Logger.LogLevel.Info)
-        Environment.Exit(0)
+        Try
+            Await RunUpdate()
+            Logger.Log("Silent mode finished successfully, exiting", Logger.LogLevel.Info)
+            ExitApplication(0)
+        Catch ex As Exception
+            Logger.Log($"Silent mode failed with unhandled error: {ex.Message}", Logger.LogLevel.Error)
+            ExitApplication(1)
+        End Try
     End Sub
 
     Private Async Function RunUpdate() As Task
@@ -116,46 +124,58 @@ Public Class VASTUpdater
             Return
         End If
 
-        progressBar1.Visible = True
-        lblStatus.Text = "Starting update check..."
+        If Not runSilently Then
+            progressBar1.Visible = True
+            lblStatus.Text = "Starting update check..."
+        End If
 
         Try
-            Await engine.PerformUpdateCheck(user, pass, Sub(p, status)
-                                                            Me.Invoke(Sub()
-                                                                          lblStatus.Text = status
-                                                                          progressBar1.Value = Math.Min(p, 100)
-                                                                      End Sub)
-                                                        End Sub)
+            Await engine.PerformUpdateCheck(user, pass,
+                Sub(p As Integer, status As String)
+                    If runSilently Then Return
+                    Try
+                        Me.Invoke(Sub()
+                                      lblStatus.Text = status
+                                      progressBar1.Value = Math.Min(Math.Max(p, 0), 100)
+                                  End Sub)
+                    Catch
+                        ' Form may be disposed during exit
+                    End Try
+                End Sub)
 
-            Me.Invoke(Sub()
-                          lblStatus.Text = "Update complete."
-                          progressBar1.Visible = False
-                      End Sub)
-
-            If runSilently Then
-                Logger.Log("Silent update successful. Exiting.", Logger.LogLevel.Info)
-                Environment.Exit(0)
-            Else
-                Logger.Log("Update completed in UI mode. Closing.", Logger.LogLevel.Info)
-                Application.Exit()
+            If Not runSilently Then
+                Me.Invoke(Sub()
+                              lblStatus.Text = "Update complete."
+                              progressBar1.Visible = False
+                          End Sub)
+                Logger.Log("Update completed in UI mode.", Logger.LogLevel.Info)
             End If
 
         Catch ex As Exception
             Logger.Log($"Update failed: {ex.Message}", Logger.LogLevel.Error)
 
-            Me.Invoke(Sub()
-                          lblStatus.Text = $"Error: {ex.Message}"
-                          progressBar1.Visible = False
+            If Not runSilently Then
+                Try
+                    Me.Invoke(Sub()
+                                  lblStatus.Text = $"Error: {ex.Message}"
+                                  progressBar1.Visible = False
+                              End Sub)
+                Catch
+                    ' Form may be disposed
+                End Try
+            End If
 
-                          If runSilently Then
-                              Logger.Log("Silent mode: exiting due to failure", Logger.LogLevel.Info)
-                              Environment.Exit(1)
-                          Else
-                              Logger.Log("UI mode: closing due to fatal error", Logger.LogLevel.Info)
-                              Me.Close()
-                              Application.Exit()
-                          End If
-                      End Sub)
+            ' Re-throw for silent mode to catch in RunSilentUpdate
+            If runSilently Then Throw
         End Try
     End Function
+
+    ''' <summary>
+    ''' Centralized exit point — ensures logging before process termination.
+    ''' </summary>
+    Private Sub ExitApplication(exitCode As Integer)
+        Logger.Log($"Application exiting with code {exitCode}", Logger.LogLevel.Info)
+        Environment.Exit(exitCode)
+    End Sub
+
 End Class

@@ -13,3 +13,13 @@ Untracked files:
 
 no changes added to commit (use "git add" and/or "git commit -a")
 === GIT ADD === 
+warning: in the working copy of 'push_fix.bat', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'git_output.txt', LF will be replaced by CRLF the next time Git touches it
+=== GIT COMMIT === 
+[main 56d8ac5] fix: silent mode reads SFTP credentials from ConfigManager
+ 2 files changed, 24 insertions(+), 6 deletions(-)
+ create mode 100644 git_output.txt
+=== GIT PUSH === 
+To https://github.com/kayleschmoyer/VAU.git
+   bf12acb..56d8ac5  main -> main
+=== DONE === 

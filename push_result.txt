@@ -1,0 +1,29 @@
+=== GIT STATUS === 
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   VastAutoUpdater/ApplicationEvents.vb
+	modified:   VastAutoUpdater/Services/ConfigManager.vb
+	modified:   VastAutoUpdater/Services/EmailService.vb
+	modified:   VastAutoUpdater/Services/InstallerPathService.vb
+	modified:   VastAutoUpdater/Services/Logger.vb
+	modified:   VastAutoUpdater/Services/ScheduledTaskService.vb
+	modified:   VastAutoUpdater/Services/SftpService.vb
+	modified:   VastAutoUpdater/Services/UpdaterEngine.vb
+	modified:   VastAutoUpdater/Services/VersionService.vb
+	modified:   VastAutoUpdater/UI/Form1.vb
+	modified:   VastAutoUpdater/VastAutoUpdater.vbproj
+	modified:   git_output.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	cleanup.bat
+	cleanup_result.txt
+	push_all_fixes.bat
+	push_result.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+=== GIT ADD === 
