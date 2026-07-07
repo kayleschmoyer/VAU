@@ -114,8 +114,19 @@ Public Class UpdaterEngineTests
         _lastStatus = status
     End Sub
 
+    ''' <summary>
+    ''' Skip tests that need a real VAST installation when running on a
+    ''' machine (e.g. a hosted CI runner) where VAST.exe is not installed.
+    ''' </summary>
+    Private Shared Sub AssumeVastInstalled()
+        If String.IsNullOrEmpty(VersionService.FindVastExecutable()) Then
+            Assert.Inconclusive("VAST.exe is not installed on this machine — skipping environment-dependent test")
+        End If
+    End Sub
+
     <TestMethod>
     Public Async Function NoUpdateAvailable_ReportsSuccess() As Task
+        AssumeVastInstalled()
         _mockSftp.LatestVersion = "0.0.0"
 
         Await _engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress)
@@ -136,6 +147,7 @@ Public Class UpdaterEngineTests
 
     <TestMethod>
     Public Async Function AlreadyUpToDate_ReportsSuccess() As Task
+        AssumeVastInstalled()
         ' GetLatestVersion returns "0.0.0" by default (no update)
         _mockSftp.LatestVersion = "0.0.0"
 
@@ -151,6 +163,13 @@ Public Class UpdaterEngineTests
         cts.Cancel()
 
         Dim task = _engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress, cts.Token)
+
+        ' Wait for the task to finish so the assertions don't race its completion
+        Try
+            task.Wait(TimeSpan.FromSeconds(30))
+        Catch ex As AggregateException
+            ' Expected — cancellation surfaces here when waiting
+        End Try
 
         Assert.IsTrue(task.IsCanceled OrElse task.IsFaulted, "Task should be cancelled or faulted")
         If task.IsFaulted Then

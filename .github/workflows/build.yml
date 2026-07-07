@@ -27,6 +27,13 @@ jobs:
       run: msbuild VastAutoUpdater.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
 
     - name: Run Tests
-      uses: microsoft/vstest-action@v1.0.0
-      with:
-        testAssembly: VastAutoUpdater.Tests\bin\Release\VastAutoUpdater.Tests.dll
+      shell: pwsh
+      run: |
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $vstest = & $vswhere -latest -products * -requires Microsoft.VisualStudio.PackageGroup.TestTools.Core -find Common7\IDE\Extensions\TestPlatform\vstest.console.exe
+        if (-not $vstest) {
+          Write-Error "vstest.console.exe not found via vswhere"
+          exit 1
+        }
+        & $vstest VastAutoUpdater.Tests\bin\Release\VastAutoUpdater.Tests.dll /TestAdapterPath:packages\MSTest.TestAdapter.3.1.1\build /Logger:trx
+        exit $LASTEXITCODE

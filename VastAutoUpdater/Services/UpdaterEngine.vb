@@ -45,6 +45,9 @@ Public Class UpdaterEngine
         Dim targetVersion As String = String.Empty
         Dim updateStarted As Boolean = False
 
+        ' Honor cancellation before doing any work (drive scan, SFTP connect)
+        cancelToken.ThrowIfCancellationRequested()
+
         Using sftp As ISftpService = _sftpFactory()
             Try
                 Logger.Log("Running update check", Logger.LogLevel.Info)
