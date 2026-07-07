@@ -152,6 +152,19 @@ Public Class UpdaterEngine
                 Await VerifyInstallerHash(sftp, latest, installer)
 
                 Logger.Log($"Download verified: {installer} ({installerInfo.Length} bytes)", Logger.LogLevel.Info)
+
+                ' VAST programs must not be running while the patch installs.
+                ' Applies to interactive and silent runs alike.
+                Dim openPrograms As List(Of String) = VastProcessService.GetRunningVastPrograms()
+                If openPrograms.Count > 0 Then
+                    progress(93, $"Closing VAST programs ({String.Join(", ", openPrograms)})...")
+                    Dim allClosed As Boolean = Await Task.Run(Function() VastProcessService.CloseVastPrograms())
+                    If Not allClosed Then
+                        Throw New UpdateException(UpdateErrorCode.ProcessCloseFailed,
+                            "Could not close all running VAST programs before the update")
+                    End If
+                End If
+
                 progress(95, "Launching installer...")
 
                 ' Launch installer unattended. VAST patch installers accept /silent
@@ -196,18 +209,24 @@ Public Class UpdaterEngine
                 ' Clean up old installers (never touches the current version's file)
                 InstallerPathService.CleanupOldInstallers(latest)
 
-                ' Only claim completion when the on-disk VAST version proves it.
-                ' Otherwise be honest: the patch is still working in the background.
-                verifiedVersion = TryGetInstalledVersion(parsedLatest)
+                ' Setup has closed = the patch is done: read the on-disk VAST
+                ' version and report exactly that. Only a wait timeout leaves
+                ' the outcome unconfirmed.
                 success = True
-                If verifiedVersion <> String.Empty Then
-                    message = $"Update {latest} installed and verified (VAST is now {verifiedVersion})"
-                    Logger.Log(message, Logger.LogLevel.Info)
-                    progress(100, "Update complete.")
-                ElseIf installerExited Then
-                    message = $"Update {latest} installer finished, but the VAST version has not changed yet — the patch may still be finalizing"
-                    Logger.Log(message, Logger.LogLevel.Warning)
-                    progress(100, "Patch is finishing in the background...")
+                If installerExited Then
+                    Dim diskVersion As String = GetInstalledVersionString()
+                    verifiedVersion = If(String.IsNullOrEmpty(diskVersion), currentVersion, diskVersion)
+
+                    Dim parsedDisk As Version = Nothing
+                    If Version.TryParse(diskVersion, parsedDisk) AndAlso parsedDisk.CompareTo(parsedLatest) >= 0 Then
+                        message = $"Update {latest} installed — VAST is now {diskVersion}"
+                        Logger.Log(message, Logger.LogLevel.Info)
+                        progress(100, "Update complete.")
+                    Else
+                        message = $"Installer finished — VAST reports version {If(String.IsNullOrEmpty(diskVersion), "unknown", diskVersion)}"
+                        Logger.Log(message, Logger.LogLevel.Warning)
+                        progress(100, message)
+                    End If
                 Else
                     message = $"Update {latest} is still installing in the background"
                     Logger.Log(message, Logger.LogLevel.Info)
@@ -232,15 +251,14 @@ Public Class UpdaterEngine
             If caughtEx IsNot Nothing Then
                 _dashboardService.ReportEvent(DashboardEventType.UpdateFailure, currentVersion, targetVersion, message)
             ElseIf updateStarted AndAlso success AndAlso verifiedVersion <> String.Empty Then
-                ' Send the verified NEW version so the dashboard reflects the
-                ' machine's actual state, not the pre-update version
+                ' Setup has closed — report the version actually on disk so the
+                ' dashboard reflects the machine's real state
                 _dashboardService.ReportEvent(DashboardEventType.UpdateSuccess, verifiedVersion, targetVersion, message)
             ElseIf updateStarted AndAlso success Then
-                ' Patch still running in the background — leave update_start as
-                ' the machine's latest state; the next run's heartbeat reports
-                ' the new version once the patch has landed. Claiming success
-                ' now would show a completed update that hasn't finished.
-                Logger.Log("Skipping update_success report — patch not yet verified on disk", Logger.LogLevel.Info)
+                ' Wait timed out with setup still running — leave update_start
+                ' as the machine's latest state; the next run's heartbeat
+                ' reports the version once the patch has landed
+                Logger.Log("Skipping update_success report — installer still running", Logger.LogLevel.Info)
             End If
         Catch dashEx As Exception
             Logger.Log($"Failed to report dashboard status: {dashEx.Message}", Logger.LogLevel.Warning)
@@ -263,24 +281,18 @@ Public Class UpdaterEngine
     End Function
 
     ''' <summary>
-    ''' Read the installed VAST version from disk and return it when it is at
-    ''' least the expected version — proof the patch actually applied.
-    ''' Returns an empty string when the version has not changed yet (patch
-    ''' still running) or when it cannot be determined.
+    ''' Read the currently installed VAST version from disk.
+    ''' Returns an empty string when it cannot be determined.
     ''' </summary>
-    Private Shared Function TryGetInstalledVersion(expected As Version) As String
+    Private Shared Function GetInstalledVersionString() As String
         Try
             Dim exePath As String = VersionService.FindVastExecutable()
             If String.IsNullOrEmpty(exePath) Then Return String.Empty
-            Dim fileVersion As String = VersionService.GetFileVersion(exePath)
-            Dim parsed As Version = Nothing
-            If Version.TryParse(fileVersion, parsed) AndAlso parsed >= expected Then
-                Return fileVersion
-            End If
+            Return VersionService.GetFileVersion(exePath)
         Catch ex As Exception
             Logger.Log($"Post-install version check failed: {ex.Message}", Logger.LogLevel.Warning)
+            Return String.Empty
         End Try
-        Return String.Empty
     End Function
 
     ''' <summary>

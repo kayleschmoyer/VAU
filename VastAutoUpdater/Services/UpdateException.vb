@@ -27,6 +27,8 @@ Public Enum UpdateErrorCode
     CredentialsMissing = 9
     ''' <summary>SFTP host configuration is missing.</summary>
     ConfigurationError = 10
+    ''' <summary>Running VAST programs could not be closed before the update.</summary>
+    ProcessCloseFailed = 11
 End Enum
 
 ''' <summary>
