@@ -12,9 +12,9 @@ obj/
 *.pfx
 
 # NuGet packages
+packages/
 *.nupkg
 *.snupkg
 
 # Local scripts and temp files
-*.bat
-*.tmp
+*.
