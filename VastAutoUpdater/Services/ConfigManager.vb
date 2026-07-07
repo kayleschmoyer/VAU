@@ -83,9 +83,9 @@ Public Module ConfigManager
         End Get
     End Property
 
-    Private Shared _companyInfoLoaded As Boolean = False
-    Private Shared _cachedCustomerName As String = Nothing
-    Private Shared _cachedSiteName As String = Nothing
+    Private _companyInfoLoaded As Boolean = False
+    Private _cachedCustomerName As String = Nothing
+    Private _cachedSiteName As String = Nothing
 
     Public ReadOnly Property CustomerName As String
         Get
@@ -237,8 +237,4 @@ Public Module ConfigManager
     ''' Logs a single summary of all missing or empty settings.
     ''' Returns True if SFTP config is complete (minimum required for update check).
     ''' </summary>
-    Public Function ValidateConfiguration() As Boolean
-        Dim missing As New List(Of String)()
-
-        If String.IsNullOrWhiteSpace(SftpHost) Then missing.Add("SftpHost")
-        If String.IsNullOrWhiteSpace(SftpUsernam
+    Pub
