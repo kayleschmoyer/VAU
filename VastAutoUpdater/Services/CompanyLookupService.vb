@@ -35,4 +35,23 @@ Public Class CompanyLookupService
 
             Using conn As New SqlConnection(connStr)
                 conn.Open()
-             
+                Using cmd As New SqlCommand("SELECT TOP 1 NAME, COMPANY_NUMBER FROM COMPANY", conn)
+                    Using reader As SqlDataReader = cmd.ExecuteReader()
+                        If reader.Read() Then
+                            Dim name As String = If(reader.IsDBNull(0), String.Empty, reader.GetString(0).Trim())
+                            Dim number As String = If(reader.IsDBNull(1), String.Empty, reader(1).ToString().Trim())
+                            Logger.Log($"Company lookup succeeded: {name} (site {number})", Logger.LogLevel.Info)
+                            Return (name, number)
+                        End If
+                    End Using
+                End Using
+            End Using
+
+            Logger.Log("Company lookup returned no rows from COMPANY table", Logger.LogLevel.Warning)
+        Catch ex As Exception
+            Logger.Log($"Company lookup failed: {ex.Message}", Logger.LogLevel.Warning)
+        End Try
+        Return (String.Empty, String.Empty)
+    End Function
+
+End Class

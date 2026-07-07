@@ -4,21 +4,46 @@ Imports System.Threading
 ''' <summary>
 ''' Main application form for the VAST Auto Updater.
 ''' Supports both interactive (UI) and silent (headless) update modes.
-''' Uses a borderless window with custom gradient header and brand styling.
+''' Borderless window with rounded corners, drop shadow, gradient header,
+''' card layout, and animated brand-styled controls.
 ''' </summary>
 Public Class MainForm
 
     Private engine As New UpdaterEngine()
     Private dashboardService As IDashboardService = New DashboardService()
     Private runSilently As Boolean
-    Private isDragging As Boolean = False
-    Private dragStart As Point
     Private updateCts As CancellationTokenSource = Nothing
+    Private fadeTimer As Windows.Forms.Timer = Nothing
 
-    ' Brand colors
-    Private Shared ReadOnly Magenta As Color = Color.FromArgb(237, 1, 127)
-    Private Shared ReadOnly MagentaDark As Color = Color.FromArgb(180, 0, 96)
-    Private Shared ReadOnly Charcoal As Color = Color.FromArgb(51, 51, 51)
+    ''' <summary>Visual state of the status line in the activity card.</summary>
+    Private Enum StatusKind
+        Ready
+        Working
+        Success
+        Warning
+        Failure
+    End Enum
+
+    Private Const CS_DROPSHADOW As Integer = &H20000
+
+    ''' <summary>
+    ''' Add a native drop shadow to the borderless window.
+    ''' </summary>
+    Protected Overrides ReadOnly Property CreateParams As CreateParams
+        Get
+            Dim cp As CreateParams = MyBase.CreateParams
+            cp.ClassStyle = cp.ClassStyle Or CS_DROPSHADOW
+            Return cp
+        End Get
+    End Property
+
+    ''' <summary>
+    ''' Request native rounded corners from DWM (Windows 11).
+    ''' </summary>
+    Protected Overrides Sub OnHandleCreated(e As EventArgs)
+        MyBase.OnHandleCreated(e)
+        UiTheme.ApplyRoundedCorners(Me.Handle)
+    End Sub
 
     ''' <summary>
     ''' Initializes the form, applies brand styling, and configures silent mode if requested.
@@ -43,39 +68,53 @@ Public Class MainForm
             Me.ShowInTaskbar = False
             Me.Opacity = 0
             Logger.Log("Starting in silent mode", Logger.LogLevel.Info)
+        Else
+            ' Start invisible; MainForm_Load fades the window in
+            Me.Opacity = 0
         End If
     End Sub
 
     ''' <summary>
-    ''' Apply brand styling and gradient painting.
+    ''' Apply brand styling: gradient header, typography, icon glyphs,
+    ''' placeholders, and event wiring.
     ''' </summary>
     Private Sub ApplyBranding()
         ' Gradient header paint
         AddHandler pnlHeader.Paint, AddressOf PaintGradientHeader
 
         ' Window drag support on header
-        AddHandler pnlHeader.MouseDown, AddressOf Header_MouseDown
-        AddHandler pnlHeader.MouseMove, AddressOf Header_MouseMove
-        AddHandler pnlHeader.MouseUp, AddressOf Header_MouseUp
-        AddHandler lblTitle.MouseDown, AddressOf Header_MouseDown
-        AddHandler lblTitle.MouseMove, AddressOf Header_MouseMove
-        AddHandler lblTitle.MouseUp, AddressOf Header_MouseUp
-        AddHandler lblSubtitle.MouseDown, AddressOf Header_MouseDown
-        AddHandler lblSubtitle.MouseMove, AddressOf Header_MouseMove
-        AddHandler lblSubtitle.MouseUp, AddressOf Header_MouseUp
+        UiTheme.AttachDrag(Me, pnlHeader)
+        UiTheme.AttachDrag(Me, lblTitle)
+        UiTheme.AttachDrag(Me, lblSubtitle)
 
-        ' Close / minimize
+        ' Typography hierarchy within the Segoe UI family
+        lblTitle.Font = UiTheme.Semibold(14.0F)
+        btnCheckForUpdates.Font = UiTheme.Semibold(10.5F)
+        lblPercent.Font = UiTheme.Semibold(9.5F)
+
+        ' Window-control glyphs: Segoe MDL2 Assets when available
+        If UiTheme.Mdl2Available Then
+            Dim glyphFont As Font = UiTheme.IconFont(9.0F)
+            btnClose.Font = glyphFont
+            btnMinimize.Font = glyphFont
+            btnSettings.Font = glyphFont
+            btnClose.Text = ChrW(&HE8BB)      ' ChromeClose
+            btnMinimize.Text = ChrW(&HE921)   ' ChromeMinimize
+            btnSettings.Text = ChrW(&HE713)   ' Settings gear
+        End If
+        lblStatusIcon.Font = UiTheme.IconFont(10.0F)
+
+        ' Input placeholders
+        txtSftpUsername.CueText = "Enter SFTP username"
+        txtSftpPassword.CueText = "Enter SFTP password"
+
+        ' Close / minimize / settings / action
         AddHandler btnClose.Click, AddressOf BtnClose_Click
         AddHandler btnMinimize.Click, AddressOf BtnMinimize_Click
-
-        ' Credential panel no longer needs custom paint
-
-        ' Custom progress bar color
-        SetProgressBarColor()
-
-        ' Button handlers
         AddHandler btnCheckForUpdates.Click, AddressOf BtnCheckForUpdates_Click
         AddHandler btnSettings.Click, AddressOf BtnSettings_Click
+
+        SetStatus("Ready for update check", StatusKind.Ready)
     End Sub
 
     ''' <summary>
@@ -87,39 +126,40 @@ Public Class MainForm
         If pnl.ClientRectangle.Width <= 0 OrElse pnl.ClientRectangle.Height <= 0 Then Return
         Using brush As New LinearGradientBrush(
             pnl.ClientRectangle,
-            Magenta,
-            MagentaDark,
+            UiTheme.Magenta,
+            UiTheme.MagentaDark,
             LinearGradientMode.Horizontal)
             e.Graphics.FillRectangle(brush, pnl.ClientRectangle)
         End Using
     End Sub
 
     ''' <summary>
-    ''' Begin window drag when the user presses the left mouse button on the header.
+    ''' Update the status line, its color, and its icon glyph in one place.
     ''' </summary>
-    Private Sub Header_MouseDown(sender As Object, e As MouseEventArgs)
-        If e.Button = MouseButtons.Left Then
-            isDragging = True
-            dragStart = e.Location
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' Move the window to follow the mouse cursor during a drag operation.
-    ''' </summary>
-    Private Sub Header_MouseMove(sender As Object, e As MouseEventArgs)
-        If isDragging Then
-            Dim ctrl As Control = DirectCast(sender, Control)
-            Dim screenPoint As Point = ctrl.PointToScreen(e.Location)
-            Me.Location = New Point(screenPoint.X - dragStart.X, screenPoint.Y - dragStart.Y)
-        End If
-    End Sub
-
-    ''' <summary>
-    ''' End the window drag operation on mouse button release.
-    ''' </summary>
-    Private Sub Header_MouseUp(sender As Object, e As MouseEventArgs)
-        isDragging = False
+    Private Sub SetStatus(text As String, kind As StatusKind)
+        lblStatus.Text = text
+        Select Case kind
+            Case StatusKind.Working
+                lblStatus.ForeColor = UiTheme.Charcoal
+                lblStatusIcon.ForeColor = UiTheme.Magenta
+                lblStatusIcon.Text = If(UiTheme.Mdl2Available, ChrW(&HE895), "↻") ' Sync
+            Case StatusKind.Success
+                lblStatus.ForeColor = UiTheme.SuccessGreen
+                lblStatusIcon.ForeColor = UiTheme.SuccessGreen
+                lblStatusIcon.Text = If(UiTheme.Mdl2Available, ChrW(&HE73E), "✓") ' CheckMark
+            Case StatusKind.Warning
+                lblStatus.ForeColor = UiTheme.MagentaDark
+                lblStatusIcon.ForeColor = UiTheme.MagentaDark
+                lblStatusIcon.Text = If(UiTheme.Mdl2Available, ChrW(&HE946), "•") ' Info
+            Case StatusKind.Failure
+                lblStatus.ForeColor = UiTheme.ErrorRed
+                lblStatusIcon.ForeColor = UiTheme.ErrorRed
+                lblStatusIcon.Text = If(UiTheme.Mdl2Available, ChrW(&HE783), "!") ' Error badge
+            Case Else
+                lblStatus.ForeColor = UiTheme.Charcoal
+                lblStatusIcon.ForeColor = UiTheme.Magenta
+                lblStatusIcon.Text = If(UiTheme.Mdl2Available, ChrW(&HE946), "•") ' Info
+        End Select
     End Sub
 
     ''' <summary>
@@ -145,25 +185,10 @@ Public Class MainForm
         End Using
     End Sub
 
-    ' -- Progress bar color hack --
-    ''' <summary>
-    ''' Apply magenta color to the progress bar via SendMessage PBM_SETBARCOLOR.
-    ''' </summary>
-    Private Sub SetProgressBarColor()
-        ' Use Win32 message to set progress bar color to magenta
-        SendMessage(progressBar1.Handle, &H409, IntPtr.Zero, New IntPtr(ColorTranslator.ToWin32(Magenta)))
-    End Sub
-
-    ''' <summary>
-    ''' Win32 SendMessage for setting progress bar color (PBM_SETBARCOLOR).
-    ''' </summary>
-    <System.Runtime.InteropServices.DllImport("user32.dll", CharSet:=System.Runtime.InteropServices.CharSet.Auto)>
-    Private Shared Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As IntPtr, lParam As IntPtr) As IntPtr
-    End Function
-
     ''' <summary>
     ''' Form load handler. Encrypts credentials on first run, validates configuration,
-    ''' discovers the current VAST version, and starts the silent update if applicable.
+    ''' discovers the current VAST version, fades the window in, and starts the
+    ''' silent update if applicable.
     ''' </summary>
     Private Sub MainForm_Load(sender As Object, e As EventArgs)
         Try
@@ -176,20 +201,39 @@ Public Class MainForm
             Dim exePath As String = VersionService.FindVastExecutable()
             If Not String.IsNullOrEmpty(exePath) Then
                 Dim version As String = VersionService.GetFileVersion(exePath)
-                lblCurrentVersion.Text = $"Current Version: {version}"
+                lblCurrentVersion.Text = $"Current version: {version}"
             Else
-                lblCurrentVersion.Text = "Current Version: Not Found"
+                lblCurrentVersion.Text = "Current version: not found"
             End If
-            lblStatus.Text = "Ready for update check..."
+            SetStatus("Ready for update check", StatusKind.Ready)
         Catch ex As Exception
             Logger.Log($"Error on load: {ex.Message}", Logger.LogLevel.Error)
-            lblStatus.Text = "Error during load"
+            SetStatus("Error during load", StatusKind.Failure)
         End Try
 
-        ' Start silent update after form handle exists and message loop is running
         If runSilently Then
+            ' Start silent update after form handle exists and message loop is running
             RunSilentUpdate()
+        Else
+            BeginFadeIn()
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Fade the window in over ~150 ms for a soft entrance.
+    ''' </summary>
+    Private Sub BeginFadeIn()
+        fadeTimer = New Windows.Forms.Timer() With {.Interval = 15}
+        AddHandler fadeTimer.Tick,
+            Sub()
+                Me.Opacity = Math.Min(1.0, Me.Opacity + 0.1)
+                If Me.Opacity >= 1.0 Then
+                    fadeTimer.Stop()
+                    fadeTimer.Dispose()
+                    fadeTimer = Nothing
+                End If
+            End Sub
+        fadeTimer.Start()
     End Sub
 
     ''' <summary>
@@ -205,13 +249,13 @@ Public Class MainForm
         End If
 
         updateCts = New CancellationTokenSource()
-        btnCheckForUpdates.Text = "CANCEL"
+        btnCheckForUpdates.Text = "Cancel"
         Try
             Await RunUpdate(updateCts.Token)
         Finally
             updateCts.Dispose()
             updateCts = Nothing
-            btnCheckForUpdates.Text = "CHECK FOR UPDATES"
+            btnCheckForUpdates.Text = "Check for updates"
         End Try
     End Sub
 
@@ -246,6 +290,29 @@ Public Class MainForm
     End Sub
 
     ''' <summary>
+    ''' Route an engine progress callback into the activity card: status line,
+    ''' percentage, detail line, progress bar, and update-availability badge.
+    ''' </summary>
+    Private Sub ApplyProgress(p As Integer, status As String)
+        progressBar1.Value = Math.Min(Math.Max(p, 0), 100)
+        lblPercent.Text = If(p > 0 AndAlso p < 100, $"{p}%", String.Empty)
+
+        If status.StartsWith("Downloading... ", StringComparison.Ordinal) Then
+            ' Byte-level download ticks go to the muted detail line
+            lblProgressDetail.Text = status.Substring("Downloading... ".Length)
+            Return
+        End If
+
+        SetStatus(status, StatusKind.Working)
+
+        If status.StartsWith("Downloading version", StringComparison.OrdinalIgnoreCase) Then
+            badgeUpdate.SetState("Update available", UiTheme.PinkPale, UiTheme.MagentaDark)
+        ElseIf status.Contains("No update available") OrElse status.Contains("up-to-date") Then
+            badgeUpdate.SetState("Up to date", UiTheme.SuccessPale, UiTheme.SuccessGreen)
+        End If
+    End Sub
+
+    ''' <summary>
     ''' Core update workflow: validates credentials, invokes the engine, and updates UI with progress.
     ''' Handles <see cref="OperationCanceledException"/>, <see cref="UpdateException"/>, and general exceptions.
     ''' </summary>
@@ -268,15 +335,14 @@ Public Class MainForm
             If runSilently Then
                 Throw New InvalidOperationException("SFTP credentials are not configured")
             End If
-            lblStatus.Text = "Enter SFTP credentials above."
-            lblStatus.ForeColor = Color.FromArgb(200, 0, 80)
+            SetStatus("Enter SFTP credentials above", StatusKind.Warning)
             Return
         End If
 
         If Not runSilently Then
-            lblStatus.ForeColor = Charcoal
-            pnlProgress.Visible = True
-            lblStatus.Text = "Starting update check..."
+            progressBar1.Value = 0
+            lblProgressDetail.Text = String.Empty
+            SetStatus("Starting update check...", StatusKind.Working)
         End If
 
         Try
@@ -284,11 +350,7 @@ Public Class MainForm
                 Sub(p As Integer, status As String)
                     If runSilently Then Return
                     Try
-                        Me.Invoke(Sub()
-                                      lblStatus.Text = status
-                                      progressBar1.Value = Math.Min(Math.Max(p, 0), 100)
-                                      progressBar1.Invalidate()
-                                  End Sub)
+                        Me.Invoke(Sub() ApplyProgress(p, status))
                     Catch
                         ' Form may be disposed during exit
                     End Try
@@ -297,9 +359,9 @@ Public Class MainForm
             If Not runSilently Then
                 Try
                     Me.Invoke(Sub()
-                                  lblStatus.Text = "Update complete."
-                                  lblStatus.ForeColor = Color.FromArgb(0, 150, 80)
-                                  pnlProgress.Visible = False
+                                  SetStatus("Update complete", StatusKind.Success)
+                                  lblPercent.Text = String.Empty
+                                  lblProgressDetail.Text = String.Empty
                               End Sub)
                 Catch
                     ' Form may be disposed during exit
@@ -312,9 +374,10 @@ Public Class MainForm
             If Not runSilently Then
                 Try
                     Me.Invoke(Sub()
-                                  lblStatus.Text = "Update check cancelled."
-                                  lblStatus.ForeColor = Charcoal
-                                  pnlProgress.Visible = False
+                                  SetStatus("Update check cancelled", StatusKind.Warning)
+                                  lblPercent.Text = String.Empty
+                                  lblProgressDetail.Text = String.Empty
+                                  progressBar1.Value = 0
                               End Sub)
                 Catch
                 End Try
@@ -326,9 +389,10 @@ Public Class MainForm
             If Not runSilently Then
                 Try
                     Me.Invoke(Sub()
-                                  lblStatus.Text = $"Error [{ex.ErrorCode}]: {ex.Message}"
-                                  lblStatus.ForeColor = Color.FromArgb(200, 0, 0)
-                                  pnlProgress.Visible = False
+                                  SetStatus($"Error [{ex.ErrorCode}]: {ex.Message}", StatusKind.Failure)
+                                  lblPercent.Text = String.Empty
+                                  lblProgressDetail.Text = String.Empty
+                                  progressBar1.Value = 0
                               End Sub)
                 Catch
                 End Try
@@ -342,9 +406,10 @@ Public Class MainForm
             If Not runSilently Then
                 Try
                     Me.Invoke(Sub()
-                                  lblStatus.Text = $"Error: {ex.Message}"
-                                  lblStatus.ForeColor = Color.FromArgb(200, 0, 0)
-                                  pnlProgress.Visible = False
+                                  SetStatus($"Error: {ex.Message}", StatusKind.Failure)
+                                  lblPercent.Text = String.Empty
+                                  lblProgressDetail.Text = String.Empty
+                                  progressBar1.Value = 0
                               End Sub)
                 Catch
                 End Try

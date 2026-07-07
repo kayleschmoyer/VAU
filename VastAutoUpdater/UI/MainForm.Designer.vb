@@ -22,25 +22,27 @@ Partial Class MainForm
     Private WithEvents btnMinimize As System.Windows.Forms.Button
     Private WithEvents btnSettings As System.Windows.Forms.Button
 
-    ' Credential inputs
-    Private WithEvents pnlCredentials As System.Windows.Forms.Panel
+    ' Credential card
+    Private WithEvents cardCredentials As CardPanel
     Private WithEvents lblUsername As System.Windows.Forms.Label
-    Private WithEvents txtSftpUsername As System.Windows.Forms.TextBox
+    Private WithEvents txtSftpUsername As ModernTextBox
     Private WithEvents lblPassword As System.Windows.Forms.Label
-    Private WithEvents txtSftpPassword As System.Windows.Forms.TextBox
+    Private WithEvents txtSftpPassword As ModernTextBox
 
     ' Action
-    Private WithEvents btnCheckForUpdates As System.Windows.Forms.Button
+    Private WithEvents btnCheckForUpdates As RoundedButton
 
-    ' Progress
-    Private WithEvents pnlProgress As System.Windows.Forms.Panel
-    Private WithEvents progressBar1 As System.Windows.Forms.ProgressBar
-
-    ' Status
+    ' Activity card (status + progress)
+    Private WithEvents cardActivity As CardPanel
+    Private WithEvents lblStatusIcon As System.Windows.Forms.Label
     Private WithEvents lblStatus As System.Windows.Forms.Label
-    Private WithEvents lblCurrentVersion As System.Windows.Forms.Label
+    Private WithEvents lblPercent As System.Windows.Forms.Label
+    Private WithEvents progressBar1 As SmoothProgressBar
+    Private WithEvents lblProgressDetail As System.Windows.Forms.Label
 
-    ' Footer accent
+    ' Footer row
+    Private WithEvents lblCurrentVersion As System.Windows.Forms.Label
+    Private WithEvents badgeUpdate As PillBadge
     Private WithEvents pnlFooter As System.Windows.Forms.Panel
 
     <System.Diagnostics.DebuggerStepThrough()>
@@ -51,20 +53,24 @@ Partial Class MainForm
         Me.btnClose = New System.Windows.Forms.Button()
         Me.btnMinimize = New System.Windows.Forms.Button()
         Me.btnSettings = New System.Windows.Forms.Button()
-        Me.pnlCredentials = New System.Windows.Forms.Panel()
+        Me.cardCredentials = New CardPanel()
         Me.lblUsername = New System.Windows.Forms.Label()
-        Me.txtSftpUsername = New System.Windows.Forms.TextBox()
+        Me.txtSftpUsername = New ModernTextBox()
         Me.lblPassword = New System.Windows.Forms.Label()
-        Me.txtSftpPassword = New System.Windows.Forms.TextBox()
-        Me.btnCheckForUpdates = New System.Windows.Forms.Button()
-        Me.pnlProgress = New System.Windows.Forms.Panel()
-        Me.progressBar1 = New System.Windows.Forms.ProgressBar()
+        Me.txtSftpPassword = New ModernTextBox()
+        Me.btnCheckForUpdates = New RoundedButton()
+        Me.cardActivity = New CardPanel()
+        Me.lblStatusIcon = New System.Windows.Forms.Label()
         Me.lblStatus = New System.Windows.Forms.Label()
+        Me.lblPercent = New System.Windows.Forms.Label()
+        Me.progressBar1 = New SmoothProgressBar()
+        Me.lblProgressDetail = New System.Windows.Forms.Label()
         Me.lblCurrentVersion = New System.Windows.Forms.Label()
+        Me.badgeUpdate = New PillBadge()
         Me.pnlFooter = New System.Windows.Forms.Panel()
         Me.pnlHeader.SuspendLayout()
-        Me.pnlCredentials.SuspendLayout()
-        Me.pnlProgress.SuspendLayout()
+        Me.cardCredentials.SuspendLayout()
+        Me.cardActivity.SuspendLayout()
         Me.SuspendLayout()
         '
         ' pnlHeader — gradient painted in code-behind
@@ -78,7 +84,7 @@ Partial Class MainForm
         Me.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top
         Me.pnlHeader.Location = New System.Drawing.Point(0, 0)
         Me.pnlHeader.Name = "pnlHeader"
-        Me.pnlHeader.Size = New System.Drawing.Size(520, 55)
+        Me.pnlHeader.Size = New System.Drawing.Size(520, 64)
         Me.pnlHeader.TabIndex = 0
         '
         ' lblTitle
@@ -87,7 +93,7 @@ Partial Class MainForm
         Me.lblTitle.BackColor = System.Drawing.Color.Transparent
         Me.lblTitle.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
         Me.lblTitle.ForeColor = System.Drawing.Color.White
-        Me.lblTitle.Location = New System.Drawing.Point(16, 8)
+        Me.lblTitle.Location = New System.Drawing.Point(20, 10)
         Me.lblTitle.Name = "lblTitle"
         Me.lblTitle.Size = New System.Drawing.Size(200, 24)
         Me.lblTitle.TabIndex = 0
@@ -99,7 +105,7 @@ Partial Class MainForm
         Me.lblSubtitle.BackColor = System.Drawing.Color.Transparent
         Me.lblSubtitle.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
         Me.lblSubtitle.ForeColor = System.Drawing.Color.FromArgb(255, 200, 230)
-        Me.lblSubtitle.Location = New System.Drawing.Point(18, 32)
+        Me.lblSubtitle.Location = New System.Drawing.Point(22, 38)
         Me.lblSubtitle.Name = "lblSubtitle"
         Me.lblSubtitle.Size = New System.Drawing.Size(180, 16)
         Me.lblSubtitle.TabIndex = 1
@@ -110,15 +116,16 @@ Partial Class MainForm
         Me.btnClose.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.btnClose.BackColor = System.Drawing.Color.Transparent
         Me.btnClose.FlatAppearance.BorderSize = 0
-        Me.btnClose.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(200, 0, 100)
-        Me.btnClose.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(220, 0, 110)
+        Me.btnClose.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(150, 0, 80)
+        Me.btnClose.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(180, 0, 96)
         Me.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnClose.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.btnClose.Font = New System.Drawing.Font("Segoe UI", 11.0!, System.Drawing.FontStyle.Regular)
         Me.btnClose.ForeColor = System.Drawing.Color.White
-        Me.btnClose.Location = New System.Drawing.Point(484, 4)
+        Me.btnClose.Location = New System.Drawing.Point(478, 15)
         Me.btnClose.Name = "btnClose"
-        Me.btnClose.Size = New System.Drawing.Size(32, 28)
+        Me.btnClose.Size = New System.Drawing.Size(32, 30)
         Me.btnClose.TabIndex = 2
+        Me.btnClose.TabStop = False
         Me.btnClose.Text = "X"
         Me.btnClose.UseVisualStyleBackColor = False
         '
@@ -127,15 +134,16 @@ Partial Class MainForm
         Me.btnMinimize.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.btnMinimize.BackColor = System.Drawing.Color.Transparent
         Me.btnMinimize.FlatAppearance.BorderSize = 0
-        Me.btnMinimize.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(200, 0, 100)
-        Me.btnMinimize.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(220, 0, 110)
+        Me.btnMinimize.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(150, 0, 80)
+        Me.btnMinimize.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(180, 0, 96)
         Me.btnMinimize.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnMinimize.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
+        Me.btnMinimize.Font = New System.Drawing.Font("Segoe UI", 11.0!, System.Drawing.FontStyle.Regular)
         Me.btnMinimize.ForeColor = System.Drawing.Color.White
-        Me.btnMinimize.Location = New System.Drawing.Point(450, 4)
+        Me.btnMinimize.Location = New System.Drawing.Point(444, 15)
         Me.btnMinimize.Name = "btnMinimize"
-        Me.btnMinimize.Size = New System.Drawing.Size(32, 28)
+        Me.btnMinimize.Size = New System.Drawing.Size(32, 30)
         Me.btnMinimize.TabIndex = 3
+        Me.btnMinimize.TabStop = False
         Me.btnMinimize.Text = "_"
         Me.btnMinimize.UseVisualStyleBackColor = False
         '
@@ -144,161 +152,194 @@ Partial Class MainForm
         Me.btnSettings.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
         Me.btnSettings.BackColor = System.Drawing.Color.Transparent
         Me.btnSettings.FlatAppearance.BorderSize = 0
-        Me.btnSettings.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(200, 0, 100)
-        Me.btnSettings.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(220, 0, 110)
+        Me.btnSettings.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(150, 0, 80)
+        Me.btnSettings.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(180, 0, 96)
         Me.btnSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnSettings.Font = New System.Drawing.Font("Segoe UI", 11.0!, System.Drawing.FontStyle.Regular)
         Me.btnSettings.ForeColor = System.Drawing.Color.White
-        Me.btnSettings.Location = New System.Drawing.Point(416, 4)
+        Me.btnSettings.Location = New System.Drawing.Point(410, 15)
         Me.btnSettings.Name = "btnSettings"
-        Me.btnSettings.Size = New System.Drawing.Size(32, 28)
+        Me.btnSettings.Size = New System.Drawing.Size(32, 30)
         Me.btnSettings.TabIndex = 7
-        Me.btnSettings.Text = ChrW(&H2699)
+        Me.btnSettings.TabStop = False
+        Me.btnSettings.Text = Global.Microsoft.VisualBasic.ChrW(&H2699)
         Me.btnSettings.UseVisualStyleBackColor = False
         '
-        ' pnlCredentials
+        ' cardCredentials
         '
-        Me.pnlCredentials.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
-        Me.pnlCredentials.BackColor = System.Drawing.Color.White
-        Me.pnlCredentials.Controls.Add(Me.lblUsername)
-        Me.pnlCredentials.Controls.Add(Me.txtSftpUsername)
-        Me.pnlCredentials.Controls.Add(Me.lblPassword)
-        Me.pnlCredentials.Controls.Add(Me.txtSftpPassword)
-        Me.pnlCredentials.Location = New System.Drawing.Point(24, 70)
-        Me.pnlCredentials.Name = "pnlCredentials"
-        Me.pnlCredentials.Padding = New System.Windows.Forms.Padding(16, 12, 16, 12)
-        Me.pnlCredentials.Size = New System.Drawing.Size(472, 130)
-        Me.pnlCredentials.TabIndex = 1
+        Me.cardCredentials.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
+        Me.cardCredentials.BackColor = System.Drawing.Color.White
+        Me.cardCredentials.Controls.Add(Me.lblUsername)
+        Me.cardCredentials.Controls.Add(Me.txtSftpUsername)
+        Me.cardCredentials.Controls.Add(Me.lblPassword)
+        Me.cardCredentials.Controls.Add(Me.txtSftpPassword)
+        Me.cardCredentials.Location = New System.Drawing.Point(24, 88)
+        Me.cardCredentials.Name = "cardCredentials"
+        Me.cardCredentials.Size = New System.Drawing.Size(472, 156)
+        Me.cardCredentials.TabIndex = 1
         '
         ' lblUsername
         '
         Me.lblUsername.AutoSize = True
-        Me.lblUsername.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.lblUsername.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
-        Me.lblUsername.Location = New System.Drawing.Point(16, 12)
+        Me.lblUsername.BackColor = System.Drawing.Color.White
+        Me.lblUsername.Font = New System.Drawing.Font("Segoe UI", 8.0!, System.Drawing.FontStyle.Bold)
+        Me.lblUsername.ForeColor = System.Drawing.Color.FromArgb(138, 138, 144)
+        Me.lblUsername.Location = New System.Drawing.Point(18, 15)
         Me.lblUsername.Name = "lblUsername"
-        Me.lblUsername.Size = New System.Drawing.Size(100, 16)
+        Me.lblUsername.Size = New System.Drawing.Size(100, 14)
         Me.lblUsername.TabIndex = 0
         Me.lblUsername.Text = "SFTP USERNAME"
         '
         ' txtSftpUsername
         '
         Me.txtSftpUsername.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
-        Me.txtSftpUsername.BackColor = System.Drawing.Color.White
-        Me.txtSftpUsername.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtSftpUsername.Font = New System.Drawing.Font("Segoe UI", 11.0!)
-        Me.txtSftpUsername.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
-        Me.txtSftpUsername.Location = New System.Drawing.Point(16, 32)
+        Me.txtSftpUsername.Location = New System.Drawing.Point(18, 35)
         Me.txtSftpUsername.Name = "txtSftpUsername"
-        Me.txtSftpUsername.Size = New System.Drawing.Size(440, 26)
+        Me.txtSftpUsername.Size = New System.Drawing.Size(436, 36)
         Me.txtSftpUsername.TabIndex = 1
         '
         ' lblPassword
         '
         Me.lblPassword.AutoSize = True
-        Me.lblPassword.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.lblPassword.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
-        Me.lblPassword.Location = New System.Drawing.Point(16, 68)
+        Me.lblPassword.BackColor = System.Drawing.Color.White
+        Me.lblPassword.Font = New System.Drawing.Font("Segoe UI", 8.0!, System.Drawing.FontStyle.Bold)
+        Me.lblPassword.ForeColor = System.Drawing.Color.FromArgb(138, 138, 144)
+        Me.lblPassword.Location = New System.Drawing.Point(18, 83)
         Me.lblPassword.Name = "lblPassword"
-        Me.lblPassword.Size = New System.Drawing.Size(100, 16)
+        Me.lblPassword.Size = New System.Drawing.Size(100, 14)
         Me.lblPassword.TabIndex = 2
         Me.lblPassword.Text = "SFTP PASSWORD"
         '
         ' txtSftpPassword
         '
         Me.txtSftpPassword.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
-        Me.txtSftpPassword.BackColor = System.Drawing.Color.White
-        Me.txtSftpPassword.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtSftpPassword.Font = New System.Drawing.Font("Segoe UI", 11.0!)
-        Me.txtSftpPassword.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
-        Me.txtSftpPassword.Location = New System.Drawing.Point(16, 88)
+        Me.txtSftpPassword.IsPassword = True
+        Me.txtSftpPassword.Location = New System.Drawing.Point(18, 103)
         Me.txtSftpPassword.Name = "txtSftpPassword"
-        Me.txtSftpPassword.Size = New System.Drawing.Size(440, 26)
+        Me.txtSftpPassword.Size = New System.Drawing.Size(436, 36)
         Me.txtSftpPassword.TabIndex = 3
-        Me.txtSftpPassword.UseSystemPasswordChar = True
         '
         ' btnCheckForUpdates
         '
         Me.btnCheckForUpdates.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
-        Me.btnCheckForUpdates.BackColor = System.Drawing.Color.FromArgb(237, 1, 127)
-        Me.btnCheckForUpdates.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.btnCheckForUpdates.FlatAppearance.BorderSize = 0
-        Me.btnCheckForUpdates.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(190, 0, 100)
-        Me.btnCheckForUpdates.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(210, 0, 115)
-        Me.btnCheckForUpdates.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnCheckForUpdates.Font = New System.Drawing.Font("Segoe UI", 11.0!, System.Drawing.FontStyle.Bold)
-        Me.btnCheckForUpdates.ForeColor = System.Drawing.Color.White
-        Me.btnCheckForUpdates.Location = New System.Drawing.Point(24, 214)
+        Me.btnCheckForUpdates.Location = New System.Drawing.Point(24, 260)
         Me.btnCheckForUpdates.Name = "btnCheckForUpdates"
-        Me.btnCheckForUpdates.Size = New System.Drawing.Size(472, 44)
+        Me.btnCheckForUpdates.Size = New System.Drawing.Size(472, 46)
         Me.btnCheckForUpdates.TabIndex = 2
-        Me.btnCheckForUpdates.Text = "CHECK FOR UPDATES"
-        Me.btnCheckForUpdates.UseVisualStyleBackColor = False
+        Me.btnCheckForUpdates.Text = "Check for updates"
         '
-        ' pnlProgress
+        ' cardActivity
         '
-        Me.pnlProgress.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
-        Me.pnlProgress.BackColor = System.Drawing.Color.White
-        Me.pnlProgress.Controls.Add(Me.progressBar1)
-        Me.pnlProgress.Location = New System.Drawing.Point(24, 272)
-        Me.pnlProgress.Name = "pnlProgress"
-        Me.pnlProgress.Padding = New System.Windows.Forms.Padding(0, 6, 0, 6)
-        Me.pnlProgress.Size = New System.Drawing.Size(472, 20)
-        Me.pnlProgress.TabIndex = 3
-        Me.pnlProgress.Visible = False
+        Me.cardActivity.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
+        Me.cardActivity.BackColor = System.Drawing.Color.White
+        Me.cardActivity.Controls.Add(Me.lblStatusIcon)
+        Me.cardActivity.Controls.Add(Me.lblStatus)
+        Me.cardActivity.Controls.Add(Me.lblPercent)
+        Me.cardActivity.Controls.Add(Me.progressBar1)
+        Me.cardActivity.Controls.Add(Me.lblProgressDetail)
+        Me.cardActivity.Location = New System.Drawing.Point(24, 322)
+        Me.cardActivity.Name = "cardActivity"
+        Me.cardActivity.Size = New System.Drawing.Size(472, 96)
+        Me.cardActivity.TabIndex = 3
         '
-        ' progressBar1
+        ' lblStatusIcon
         '
-        Me.progressBar1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.progressBar1.Location = New System.Drawing.Point(0, 6)
-        Me.progressBar1.Name = "progressBar1"
-        Me.progressBar1.Size = New System.Drawing.Size(472, 8)
-        Me.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous
-        Me.progressBar1.TabIndex = 0
+        Me.lblStatusIcon.BackColor = System.Drawing.Color.White
+        Me.lblStatusIcon.Font = New System.Drawing.Font("Segoe UI", 10.0!)
+        Me.lblStatusIcon.ForeColor = System.Drawing.Color.FromArgb(237, 1, 127)
+        Me.lblStatusIcon.Location = New System.Drawing.Point(16, 16)
+        Me.lblStatusIcon.Name = "lblStatusIcon"
+        Me.lblStatusIcon.Size = New System.Drawing.Size(24, 22)
+        Me.lblStatusIcon.TabIndex = 0
+        Me.lblStatusIcon.Text = ""
+        Me.lblStatusIcon.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
         '
         ' lblStatus
         '
         Me.lblStatus.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
+        Me.lblStatus.BackColor = System.Drawing.Color.White
         Me.lblStatus.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Regular)
         Me.lblStatus.ForeColor = System.Drawing.Color.FromArgb(51, 51, 51)
-        Me.lblStatus.Location = New System.Drawing.Point(24, 302)
+        Me.lblStatus.Location = New System.Drawing.Point(44, 18)
         Me.lblStatus.Name = "lblStatus"
-        Me.lblStatus.Size = New System.Drawing.Size(472, 20)
-        Me.lblStatus.TabIndex = 4
-        Me.lblStatus.Text = "Ready for update check..."
+        Me.lblStatus.Size = New System.Drawing.Size(336, 20)
+        Me.lblStatus.TabIndex = 1
+        Me.lblStatus.Text = "Ready for update check"
+        '
+        ' lblPercent
+        '
+        Me.lblPercent.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
+        Me.lblPercent.BackColor = System.Drawing.Color.White
+        Me.lblPercent.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.lblPercent.ForeColor = System.Drawing.Color.FromArgb(237, 1, 127)
+        Me.lblPercent.Location = New System.Drawing.Point(388, 18)
+        Me.lblPercent.Name = "lblPercent"
+        Me.lblPercent.Size = New System.Drawing.Size(66, 20)
+        Me.lblPercent.TabIndex = 2
+        Me.lblPercent.Text = ""
+        Me.lblPercent.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        ' progressBar1
+        '
+        Me.progressBar1.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
+        Me.progressBar1.Location = New System.Drawing.Point(18, 50)
+        Me.progressBar1.Name = "progressBar1"
+        Me.progressBar1.Size = New System.Drawing.Size(436, 6)
+        Me.progressBar1.TabIndex = 3
+        '
+        ' lblProgressDetail
+        '
+        Me.lblProgressDetail.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
+        Me.lblProgressDetail.BackColor = System.Drawing.Color.White
+        Me.lblProgressDetail.Font = New System.Drawing.Font("Segoe UI", 8.5!)
+        Me.lblProgressDetail.ForeColor = System.Drawing.Color.FromArgb(138, 138, 144)
+        Me.lblProgressDetail.Location = New System.Drawing.Point(18, 64)
+        Me.lblProgressDetail.Name = "lblProgressDetail"
+        Me.lblProgressDetail.Size = New System.Drawing.Size(436, 18)
+        Me.lblProgressDetail.TabIndex = 4
+        Me.lblProgressDetail.Text = ""
         '
         ' lblCurrentVersion
         '
-        Me.lblCurrentVersion.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
+        Me.lblCurrentVersion.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left, System.Windows.Forms.AnchorStyles)
         Me.lblCurrentVersion.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular)
-        Me.lblCurrentVersion.ForeColor = System.Drawing.Color.FromArgb(140, 140, 140)
-        Me.lblCurrentVersion.Location = New System.Drawing.Point(24, 326)
+        Me.lblCurrentVersion.ForeColor = System.Drawing.Color.FromArgb(138, 138, 144)
+        Me.lblCurrentVersion.Location = New System.Drawing.Point(24, 432)
         Me.lblCurrentVersion.Name = "lblCurrentVersion"
-        Me.lblCurrentVersion.Size = New System.Drawing.Size(472, 18)
-        Me.lblCurrentVersion.TabIndex = 5
-        Me.lblCurrentVersion.Text = "Current Version: ..."
+        Me.lblCurrentVersion.Size = New System.Drawing.Size(300, 18)
+        Me.lblCurrentVersion.TabIndex = 4
+        Me.lblCurrentVersion.Text = "Current version: ..."
+        '
+        ' badgeUpdate
+        '
+        Me.badgeUpdate.Anchor = CType(System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right, System.Windows.Forms.AnchorStyles)
+        Me.badgeUpdate.Location = New System.Drawing.Point(396, 430)
+        Me.badgeUpdate.Name = "badgeUpdate"
+        Me.badgeUpdate.Size = New System.Drawing.Size(100, 22)
+        Me.badgeUpdate.TabIndex = 5
+        Me.badgeUpdate.Text = ""
         '
         ' pnlFooter — thin magenta accent bar at the bottom
         '
         Me.pnlFooter.BackColor = System.Drawing.Color.FromArgb(237, 1, 127)
         Me.pnlFooter.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlFooter.Location = New System.Drawing.Point(0, 356)
+        Me.pnlFooter.Location = New System.Drawing.Point(0, 459)
         Me.pnlFooter.Name = "pnlFooter"
-        Me.pnlFooter.Size = New System.Drawing.Size(520, 4)
+        Me.pnlFooter.Size = New System.Drawing.Size(520, 3)
         Me.pnlFooter.TabIndex = 6
         '
         ' MainForm
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
-        Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(520, 360)
+        Me.BackColor = System.Drawing.Color.FromArgb(246, 246, 248)
+        Me.ClientSize = New System.Drawing.Size(520, 462)
         Me.Controls.Add(Me.pnlFooter)
+        Me.Controls.Add(Me.badgeUpdate)
         Me.Controls.Add(Me.lblCurrentVersion)
-        Me.Controls.Add(Me.lblStatus)
-        Me.Controls.Add(Me.pnlProgress)
+        Me.Controls.Add(Me.cardActivity)
         Me.Controls.Add(Me.btnCheckForUpdates)
-        Me.Controls.Add(Me.pnlCredentials)
+        Me.Controls.Add(Me.cardCredentials)
         Me.Controls.Add(Me.pnlHeader)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.MaximizeBox = False
@@ -307,9 +348,9 @@ Partial Class MainForm
         Me.Text = "VAST Updater"
         Me.pnlHeader.ResumeLayout(False)
         Me.pnlHeader.PerformLayout()
-        Me.pnlCredentials.ResumeLayout(False)
-        Me.pnlCredentials.PerformLayout()
-        Me.pnlProgress.ResumeLayout(False)
+        Me.cardCredentials.ResumeLayout(False)
+        Me.cardCredentials.PerformLayout()
+        Me.cardActivity.ResumeLayout(False)
         Me.ResumeLayout(False)
     End Sub
 

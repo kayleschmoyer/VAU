@@ -237,4 +237,25 @@ Public Module ConfigManager
     ''' Logs a single summary of all missing or empty settings.
     ''' Returns True if SFTP config is complete (minimum required for update check).
     ''' </summary>
-    Pub
+    Public Function ValidateConfiguration() As Boolean
+        Dim missing As New List(Of String)()
+
+        If String.IsNullOrWhiteSpace(SftpHost) Then missing.Add("SftpHost")
+        If String.IsNullOrWhiteSpace(SftpUsername) Then missing.Add("SftpUsername")
+        If String.IsNullOrWhiteSpace(SftpPassword) Then missing.Add("SftpPassword")
+        If String.IsNullOrWhiteSpace(SmtpHost) Then missing.Add("SmtpHost")
+        If String.IsNullOrWhiteSpace(SmtpUsername) Then missing.Add("SmtpUsername")
+        If String.IsNullOrWhiteSpace(SmtpPassword) Then missing.Add("SmtpPassword")
+        If String.IsNullOrWhiteSpace(EmailTo) Then missing.Add("EmailTo")
+
+        If missing.Count > 0 Then
+            Logger.Log($"Missing or empty configuration values: {String.Join(", ", missing)}", Logger.LogLevel.Warning)
+        End If
+
+        ' SFTP settings are the minimum required to run an update check
+        Return Not String.IsNullOrWhiteSpace(SftpHost) AndAlso
+               Not String.IsNullOrWhiteSpace(SftpUsername) AndAlso
+               Not String.IsNullOrWhiteSpace(SftpPassword)
+    End Function
+
+End Module

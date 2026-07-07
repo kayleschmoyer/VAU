@@ -122,6 +122,7 @@ Public Class UpdaterEngine
                     Throw New UpdateException(UpdateErrorCode.DownloadFailed, $"Remote installer file not found: {latest}.exe")
                 End If
 
+                Dim totalMb As Long = CLng(Math.Ceiling(remoteSize / 1048576.0))
                 Dim downloadOk As Boolean = Await Task.Run(
                     Function() sftp.DownloadFile($"{latest}.exe", installer,
                         Sub(bytesTransferred As ULong)
@@ -129,7 +130,7 @@ Public Class UpdaterEngine
                             Dim ratio As Double = Math.Min(CDbl(bytesTransferred) / CDbl(remoteSize), 1.0)
                             Dim pct As Integer = 20 + CInt(Math.Floor(ratio * 70))
                             Dim mbTransferred As Long = CLng(bytesTransferred \ 1048576UL)
-                            progress(pct, $"Downloading... {mbTransferred} MB")
+                            progress(pct, $"Downloading... {mbTransferred} MB of {totalMb} MB")
                         End Sub))
 
                 If Not downloadOk Then

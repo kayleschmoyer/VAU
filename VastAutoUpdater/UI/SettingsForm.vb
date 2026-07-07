@@ -6,25 +6,42 @@ Imports System.Windows.Forms
 
 ''' <summary>
 ''' Settings dialog for configuring the SQL Server instance, customer identity,
-''' and site number. The TEST button queries VastOffice and auto-fills
+''' and site number. The Test button queries VastOffice and auto-fills
 ''' Customer Name and Site Number from the COMPANY table.
+''' Styled to match the main window: borderless, rounded, card layout.
 ''' </summary>
 Public Class SettingsForm
     Inherits Form
 
-    Private txtDatabaseServer As TextBox
-    Private txtCustomerName As TextBox
-    Private txtSiteNumber As TextBox
-    Private btnTestConnection As Button
-    Private btnSave As Button
-    Private btnCancel As Button
+    Private txtDatabaseServer As ModernTextBox
+    Private txtCustomerName As ModernTextBox
+    Private txtSiteNumber As ModernTextBox
+    Private btnTestConnection As RoundedButton
+    Private btnSave As RoundedButton
+    Private btnCancel As RoundedButton
+    Private btnClose As Button
+    Private pnlHeader As Panel
+    Private lblFormTitle As Label
+    Private card As CardPanel
     Private lblDatabaseServer As Label
     Private lblDbHint As Label
     Private lblCustomerName As Label
     Private lblSiteNumber As Label
 
-    Private Shared ReadOnly Magenta As Color = Color.FromArgb(237, 1, 127)
-    Private Shared ReadOnly Charcoal As Color = Color.FromArgb(51, 51, 51)
+    Private Const CS_DROPSHADOW As Integer = &H20000
+
+    Protected Overrides ReadOnly Property CreateParams As CreateParams
+        Get
+            Dim cp As CreateParams = MyBase.CreateParams
+            cp.ClassStyle = cp.ClassStyle Or CS_DROPSHADOW
+            Return cp
+        End Get
+    End Property
+
+    Protected Overrides Sub OnHandleCreated(e As EventArgs)
+        MyBase.OnHandleCreated(e)
+        UiTheme.ApplyRoundedCorners(Me.Handle)
+    End Sub
 
     Public Sub New()
         InitializeSettingsForm()
@@ -32,119 +49,161 @@ Public Class SettingsForm
     End Sub
 
     Private Sub InitializeSettingsForm()
+        Me.SuspendLayout()
         Me.Text = "Settings"
-        Me.Size = New Size(420, 320)
-        Me.FormBorderStyle = FormBorderStyle.FixedDialog
+        Me.ClientSize = New Size(440, 392)
+        Me.FormBorderStyle = FormBorderStyle.None
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.StartPosition = FormStartPosition.CenterParent
-        Me.BackColor = Color.White
+        Me.BackColor = UiTheme.Canvas
         Me.Font = New Font("Segoe UI", 9.0!)
 
-        ' --- Database Server (top) ---
-        lblDatabaseServer = New Label() With {
-            .Text = "DATABASE SERVER",
-            .Location = New Point(20, 20),
-            .Size = New Size(360, 18),
-            .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-            .ForeColor = Charcoal
+        ' --- Header ---
+        ' Size must be set before anchored children are added, or the
+        ' right-anchored close button ends up positioned off-screen
+        pnlHeader = New Panel() With {
+            .BackColor = UiTheme.Magenta,
+            .Size = New Size(440, 48),
+            .Dock = DockStyle.Top
         }
 
-        txtDatabaseServer = New TextBox() With {
-            .Location = New Point(20, 42),
-            .Size = New Size(260, 26),
-            .Font = New Font("Segoe UI", 11.0!),
-            .BorderStyle = BorderStyle.FixedSingle
-        }
-
-        btnTestConnection = New Button() With {
-            .Text = "TEST",
-            .Location = New Point(290, 42),
-            .Size = New Size(90, 26),
-            .FlatStyle = FlatStyle.Flat,
-            .BackColor = Color.FromArgb(0, 150, 80),
+        lblFormTitle = New Label() With {
+            .Text = "Settings",
+            .Font = UiTheme.Semibold(12.0F),
             .ForeColor = Color.White,
-            .Font = New Font("Segoe UI", 8.0!, FontStyle.Bold),
-            .Cursor = Cursors.Hand
+            .BackColor = Color.Transparent,
+            .Location = New Point(18, 12),
+            .AutoSize = True
         }
-        btnTestConnection.FlatAppearance.BorderSize = 0
+
+        btnClose = New Button() With {
+            .FlatStyle = FlatStyle.Flat,
+            .BackColor = Color.Transparent,
+            .ForeColor = Color.White,
+            .Font = If(UiTheme.Mdl2Available, UiTheme.IconFont(9.0F), New Font("Segoe UI", 11.0!)),
+            .Text = If(UiTheme.Mdl2Available, ChrW(&HE8BB), "X"),
+            .Location = New Point(398, 9),
+            .Size = New Size(32, 30),
+            .TabStop = False,
+            .Anchor = AnchorStyles.Top Or AnchorStyles.Right
+        }
+        btnClose.FlatAppearance.BorderSize = 0
+        btnClose.FlatAppearance.MouseOverBackColor = UiTheme.MagentaDark
+        btnClose.FlatAppearance.MouseDownBackColor = UiTheme.MagentaDeep
+
+        pnlHeader.Controls.Add(lblFormTitle)
+        pnlHeader.Controls.Add(btnClose)
+
+        ' --- Card with the form fields ---
+        card = New CardPanel() With {
+            .Location = New Point(20, 68),
+            .Size = New Size(400, 250)
+        }
+
+        lblDatabaseServer = MakeFieldLabel("DATABASE SERVER", New Point(18, 16))
+
+        txtDatabaseServer = New ModernTextBox() With {
+            .Location = New Point(18, 36),
+            .Size = New Size(268, 36),
+            .CueText = "e.g. .\SQLEXPRESS"
+        }
+
+        btnTestConnection = New RoundedButton() With {
+            .Text = "Test",
+            .Location = New Point(294, 36),
+            .Size = New Size(88, 36),
+            .CornerRadius = 8,
+            .AccentColor = UiTheme.SuccessGreen,
+            .AccentDarkColor = Color.FromArgb(0, 120, 64),
+            .Font = UiTheme.Semibold(9.0F)
+        }
 
         lblDbHint = New Label() With {
-            .Text = "e.g. .\SQLEXPRESS  or  SERVERNAME\SQLEXPRESS  or  SERVERNAME",
-            .Location = New Point(20, 72),
-            .Size = New Size(360, 16),
+            .Text = "Examples: .\SQLEXPRESS or SERVERNAME\SQLEXPRESS",
+            .Location = New Point(18, 80),
+            .Size = New Size(364, 16),
             .Font = New Font("Segoe UI", 8.0!, FontStyle.Italic),
-            .ForeColor = Color.FromArgb(140, 140, 140)
+            .ForeColor = UiTheme.TextMuted,
+            .BackColor = Color.White
         }
 
-        ' --- Customer Name ---
-        lblCustomerName = New Label() With {
-            .Text = "CUSTOMER NAME",
-            .Location = New Point(20, 100),
-            .Size = New Size(360, 18),
-            .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-            .ForeColor = Charcoal
+        lblCustomerName = MakeFieldLabel("CUSTOMER NAME", New Point(18, 106))
+
+        txtCustomerName = New ModernTextBox() With {
+            .Location = New Point(18, 126),
+            .Size = New Size(364, 36)
         }
 
-        txtCustomerName = New TextBox() With {
-            .Location = New Point(20, 122),
-            .Size = New Size(360, 26),
-            .Font = New Font("Segoe UI", 11.0!),
-            .BorderStyle = BorderStyle.FixedSingle
+        lblSiteNumber = MakeFieldLabel("SITE NUMBER", New Point(18, 176))
+
+        txtSiteNumber = New ModernTextBox() With {
+            .Location = New Point(18, 196),
+            .Size = New Size(364, 36)
         }
 
-        ' --- Site Number ---
-        lblSiteNumber = New Label() With {
-            .Text = "SITE NUMBER",
-            .Location = New Point(20, 160),
-            .Size = New Size(360, 18),
-            .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-            .ForeColor = Charcoal
+        card.Controls.AddRange({lblDatabaseServer, txtDatabaseServer, btnTestConnection, lblDbHint,
+                                lblCustomerName, txtCustomerName,
+                                lblSiteNumber, txtSiteNumber})
+
+        ' --- Action buttons ---
+        btnSave = New RoundedButton() With {
+            .Text = "Save",
+            .Location = New Point(230, 334),
+            .Size = New Size(92, 40),
+            .Font = UiTheme.Semibold(9.5F)
         }
 
-        txtSiteNumber = New TextBox() With {
-            .Location = New Point(20, 182),
-            .Size = New Size(360, 26),
-            .Font = New Font("Segoe UI", 11.0!),
-            .BorderStyle = BorderStyle.FixedSingle
+        btnCancel = New RoundedButton() With {
+            .Text = "Cancel",
+            .Location = New Point(330, 334),
+            .Size = New Size(90, 40),
+            .AccentColor = Color.FromArgb(228, 228, 234),
+            .AccentDarkColor = Color.FromArgb(206, 206, 214),
+            .ForeColor = UiTheme.Charcoal,
+            .Font = UiTheme.Semibold(9.5F)
         }
 
-        ' --- Buttons ---
-        btnSave = New Button() With {
-            .Text = "SAVE",
-            .Location = New Point(210, 230),
-            .Size = New Size(80, 36),
-            .FlatStyle = FlatStyle.Flat,
-            .BackColor = Magenta,
-            .ForeColor = Color.White,
-            .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-            .Cursor = Cursors.Hand
+        ' --- Footer accent ---
+        Dim pnlFooter As New Panel() With {
+            .BackColor = UiTheme.Magenta,
+            .Dock = DockStyle.Bottom,
+            .Height = 3
         }
-        btnSave.FlatAppearance.BorderSize = 0
-
-        btnCancel = New Button() With {
-            .Text = "CANCEL",
-            .Location = New Point(300, 230),
-            .Size = New Size(80, 36),
-            .FlatStyle = FlatStyle.Flat,
-            .BackColor = Color.FromArgb(200, 200, 200),
-            .ForeColor = Charcoal,
-            .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-            .Cursor = Cursors.Hand
-        }
-        btnCancel.FlatAppearance.BorderSize = 0
 
         AddHandler btnTestConnection.Click, AddressOf BtnTestConnection_Click
         AddHandler btnSave.Click, AddressOf BtnSave_Click
         AddHandler btnCancel.Click, AddressOf BtnCancel_Click
+        AddHandler btnClose.Click, AddressOf BtnCancel_Click
 
-        Me.Controls.AddRange({lblDatabaseServer, txtDatabaseServer, btnTestConnection, lblDbHint,
-                              lblCustomerName, txtCustomerName,
-                              lblSiteNumber, txtSiteNumber,
-                              btnSave, btnCancel})
+        UiTheme.AttachDrag(Me, pnlHeader)
+        UiTheme.AttachDrag(Me, lblFormTitle)
+
+        Me.Controls.AddRange({card, btnSave, btnCancel, pnlFooter, pnlHeader})
         Me.AcceptButton = btnSave
         Me.CancelButton = btnCancel
+
+        ' AutoScale properties must be set after controls are added (designer
+        ' ordering) for per-monitor DPI scaling to apply at ResumeLayout
+        Me.AutoScaleDimensions = New SizeF(96.0F, 96.0F)
+        Me.AutoScaleMode = AutoScaleMode.Dpi
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
     End Sub
+
+    ''' <summary>
+    ''' Small muted field label used above each input.
+    ''' </summary>
+    Private Shared Function MakeFieldLabel(text As String, location As Point) As Label
+        Return New Label() With {
+            .Text = text,
+            .Location = location,
+            .AutoSize = True,
+            .Font = New Font("Segoe UI", 8.0!, FontStyle.Bold),
+            .ForeColor = UiTheme.TextMuted,
+            .BackColor = Color.White
+        }
+    End Function
 
     Private Sub LoadSettings()
         Try
@@ -204,7 +263,7 @@ Public Class SettingsForm
             ShowConnectionError(server, ex)
         Finally
             btnTestConnection.Enabled = True
-            btnTestConnection.Text = "TEST"
+            btnTestConnection.Text = "Test"
         End Try
     End Sub
 
@@ -215,7 +274,6 @@ Public Class SettingsForm
         Const CONTENT_WIDTH As Integer = 380
         Const MARGIN As Integer = 24
         Const PADDING As Integer = 12
-        Dim SuccessGreen As Color = Color.FromArgb(0, 150, 80)
 
         Using dlg As New Form()
             dlg.Text = "Connection Successful"
@@ -228,15 +286,15 @@ Public Class SettingsForm
 
             ' Green accent bar
             Dim pnlAccent As New Panel() With {
-                .BackColor = SuccessGreen,
+                .BackColor = UiTheme.SuccessGreen,
                 .Dock = DockStyle.Top,
                 .Height = 4
             }
 
             Dim lblTitle As New Label() With {
                 .Text = "Connection Successful",
-                .Font = New Font("Segoe UI", 14.0!, FontStyle.Bold),
-                .ForeColor = SuccessGreen,
+                .Font = UiTheme.Semibold(14.0F),
+                .ForeColor = UiTheme.SuccessGreen,
                 .MaximumSize = New Size(CONTENT_WIDTH, 0),
                 .AutoSize = True
             }
@@ -244,30 +302,27 @@ Public Class SettingsForm
             Dim lblDetails As New Label() With {
                 .Text = "Customer Name:  " & compName & vbCrLf & "Site Number:  " & compNum,
                 .Font = New Font("Segoe UI", 11.0!),
-                .ForeColor = Charcoal,
+                .ForeColor = UiTheme.Charcoal,
                 .MaximumSize = New Size(CONTENT_WIDTH, 0),
                 .AutoSize = True
             }
 
             Dim lblNote As New Label() With {
-                .Text = "These values have been filled in below. Click SAVE to keep them.",
+                .Text = "These values have been filled in below. Click Save to keep them.",
                 .Font = New Font("Segoe UI", 9.0!, FontStyle.Italic),
                 .ForeColor = Color.FromArgb(100, 100, 100),
                 .MaximumSize = New Size(CONTENT_WIDTH, 0),
                 .AutoSize = True
             }
 
-            Dim btnOk As New Button() With {
+            Dim btnOk As New RoundedButton() With {
                 .Text = "OK",
-                .Size = New Size(80, 34),
-                .FlatStyle = FlatStyle.Flat,
-                .BackColor = SuccessGreen,
-                .ForeColor = Color.White,
-                .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-                .Cursor = Cursors.Hand,
+                .Size = New Size(84, 36),
+                .AccentColor = UiTheme.SuccessGreen,
+                .AccentDarkColor = Color.FromArgb(0, 120, 64),
+                .Font = UiTheme.Semibold(9.0F),
                 .DialogResult = DialogResult.OK
             }
-            btnOk.FlatAppearance.BorderSize = 0
 
             dlg.Controls.AddRange({pnlAccent, lblTitle, lblDetails, lblNote, btnOk})
 
@@ -367,7 +422,7 @@ Public Class SettingsForm
 
             ' Magenta accent bar
             Dim pnlAccent As New Panel() With {
-                .BackColor = Magenta,
+                .BackColor = UiTheme.Magenta,
                 .Dock = DockStyle.Top,
                 .Height = 4
             }
@@ -375,8 +430,8 @@ Public Class SettingsForm
             ' Title
             Dim lblTitle As New Label() With {
                 .Text = title,
-                .Font = New Font("Segoe UI", 14.0!, FontStyle.Bold),
-                .ForeColor = Magenta,
+                .Font = UiTheme.Semibold(14.0F),
+                .ForeColor = UiTheme.Magenta,
                 .MaximumSize = New Size(CONTENT_WIDTH, 0),
                 .AutoSize = True
             }
@@ -399,8 +454,8 @@ Public Class SettingsForm
             ' How to fix label
             Dim lblHowLabel As New Label() With {
                 .Text = "How to fix this:",
-                .Font = New Font("Segoe UI", 9.5!, FontStyle.Bold),
-                .ForeColor = Charcoal,
+                .Font = UiTheme.Semibold(9.5F),
+                .ForeColor = UiTheme.Charcoal,
                 .AutoSize = True
             }
 
@@ -413,18 +468,13 @@ Public Class SettingsForm
                 .AutoSize = True
             }
 
-            ' GOT IT button
-            Dim btnOk As New Button() With {
-                .Text = "GOT IT",
-                .Size = New Size(100, 36),
-                .FlatStyle = FlatStyle.Flat,
-                .BackColor = Magenta,
-                .ForeColor = Color.White,
-                .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-                .Cursor = Cursors.Hand,
+            ' Got it button
+            Dim btnOk As New RoundedButton() With {
+                .Text = "Got it",
+                .Size = New Size(100, 38),
+                .Font = UiTheme.Semibold(9.0F),
                 .DialogResult = DialogResult.OK
             }
-            btnOk.FlatAppearance.BorderSize = 0
 
             ' Add controls so they measure correctly
             dlg.Controls.AddRange({pnlAccent, lblTitle, lblWhat, pnlSep, lblHowLabel, lblHow, btnOk})
