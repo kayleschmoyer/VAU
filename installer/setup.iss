@@ -36,7 +36,9 @@ Name: "scheduledtask"; Description: "Run silent update check daily at 2:00 AM"; 
 ; Command="{app}\VastAutoUpdater.exe" with Arguments=silent — the previous
 ; triple-quote form made schtasks reject the command ("Invalid argument
 ; 'Files\VAST'") and the task was never created.
-Filename: "schtasks.exe"; Parameters: "/Create /TN ""VAST Auto Updater"" /TR ""\""{app}\VastAutoUpdater.exe\"" silent"" /SC DAILY /ST 02:00 /RL HIGHEST /F"; Flags: runhidden; Tasks: scheduledtask
+; /RU SYSTEM makes the task run whether or not anyone is logged on (the app
+; is fully headless in silent mode and all its paths are machine-scoped).
+Filename: "schtasks.exe"; Parameters: "/Create /TN ""VAST Auto Updater"" /TR ""\""{app}\VastAutoUpdater.exe\"" silent"" /SC DAILY /ST 02:00 /RU SYSTEM /RL HIGHEST /F"; Flags: runhidden; Tasks: scheduledtask
 ; Offer to launch after install
 Filename: "{app}\VastAutoUpdater.exe"; Description: "Launch VAST Auto Updater"; Flags: nowait postinstall skipifsilent shellexec
 

@@ -151,11 +151,15 @@ Public Class UpdaterEngine
                 Logger.Log($"Download verified: {installer} ({installerInfo.Length} bytes)", Logger.LogLevel.Info)
                 progress(95, "Launching installer...")
 
-                ' Launch installer and wait briefly to confirm it started
+                ' Launch installer unattended and wait briefly to confirm it started.
+                ' VAST patch installers accept /silent for a no-UI install, which
+                ' also keeps the 2:00 AM SYSTEM scheduled task fully headless.
                 Dim proc As Process = Nothing
                 Try
+                    Logger.Log($"Launching installer: ""{installer}"" /silent", Logger.LogLevel.Info)
                     proc = Process.Start(New ProcessStartInfo With {
                         .FileName = installer,
+                        .Arguments = "/silent",
                         .UseShellExecute = True
                     })
 
