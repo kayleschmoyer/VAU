@@ -180,4 +180,34 @@ Public Module ConfigManager
         End Try
     End Sub
 
-    ''' <su
+    ''' <summary>
+    ''' Validate all required configuration values on startup.
+    ''' Logs a single summary of all missing or empty settings.
+    ''' Returns True if SFTP config is complete (minimum required for update check).
+    ''' </summary>
+    Public Function ValidateConfiguration() As Boolean
+        Dim missing As New List(Of String)()
+
+        If String.IsNullOrWhiteSpace(SftpHost) Then missing.Add("SftpHost")
+        If String.IsNullOrWhiteSpace(SftpUsername) Then missing.Add("SftpUsername")
+        If String.IsNullOrWhiteSpace(SftpPassword) Then missing.Add("SftpPassword")
+        If String.IsNullOrWhiteSpace(SmtpHost) Then missing.Add("SmtpHost")
+        If String.IsNullOrWhiteSpace(SmtpUsername) Then missing.Add("SmtpUsername")
+        If String.IsNullOrWhiteSpace(SmtpPassword) Then missing.Add("SmtpPassword")
+        If String.IsNullOrWhiteSpace(EmailFrom) Then missing.Add("EmailFrom")
+        If String.IsNullOrWhiteSpace(EmailTo) Then missing.Add("EmailTo")
+
+        If missing.Count > 0 Then
+            Logger.Log($"Configuration incomplete — missing: {String.Join(", ", missing)}", Logger.LogLevel.Warning)
+        Else
+            Logger.Log("All configuration values present", Logger.LogLevel.Info)
+        End If
+
+        ' SFTP config is the minimum required to perform an update check
+        Dim sftpReady As Boolean = Not String.IsNullOrWhiteSpace(SftpHost) AndAlso
+                                   Not String.IsNullOrWhiteSpace(SftpUsername) AndAlso
+                                   Not String.IsNullOrWhiteSpace(SftpPassword)
+        Return sftpReady
+    End Function
+
+End Module

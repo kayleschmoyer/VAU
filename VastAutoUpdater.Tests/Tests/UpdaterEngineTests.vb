@@ -153,4 +153,83 @@ Public Class UpdaterEngineTests
     Public Sub Constructor_DefaultServices_DoesNotThrow()
         ' Verify the parameterless constructor works
         Dim engine As New UpdaterEngine()
-        Assert.IsNotNull(
+        Assert.IsNotNull(engine)
+    End Sub
+
+    <TestMethod>
+    Public Sub VastNotFound_ThrowsUpdateExceptionWithCorrectCode()
+        ' VAST.exe won't exist in the test environment, so the engine
+        ' should throw UpdateException with VastNotFound error code
+        Dim thrown As UpdateException = Nothing
+        Try
+            _engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress).Wait()
+        Catch ex As AggregateException
+            thrown = TryCast(ex.InnerException, UpdateException)
+        End Try
+
+        Assert.IsNotNull(thrown, "Should throw UpdateException when VAST.exe not found")
+        Assert.AreEqual(UpdateErrorCode.VastNotFound, thrown.ErrorCode)
+    End Sub
+
+    <TestMethod>
+    Public Sub VastNotFound_EmailStillSent()
+        ' Even when VAST.exe is not found, summary email should be sent
+        Try
+            _engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress).Wait()
+        Catch ex As AggregateException
+            ' Expected
+        End Try
+
+        Assert.IsTrue(_mockEmail.SendCalled, "Email should be sent even on VastNotFound")
+        Assert.IsFalse(_mockEmail.LastSuccess, "Email should report failure")
+    End Sub
+
+    <TestMethod>
+    Public Sub ProgressCallback_IsInvoked()
+        ' Even when failing early (VastNotFound), the initial progress should fire
+        Dim progressCalled As Boolean = False
+        Dim progressAction As Action(Of Integer, String) = Sub(p, s) progressCalled = True
+
+        Try
+            _engine.PerformUpdateCheck("user", "pass", progressAction).Wait()
+        Catch ex As AggregateException
+            ' Expected
+        End Try
+
+        Assert.IsTrue(progressCalled, "Progress callback should be invoked at least once")
+    End Sub
+
+    <TestMethod>
+    Public Sub SftpDisposed_AfterExecution()
+        ' After the engine runs (even on failure), the SFTP service should be disposed
+        Try
+            _engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress).Wait()
+        Catch ex As AggregateException
+            ' Expected — VastNotFound
+        End Try
+
+        Assert.IsTrue(_mockSftp.DisconnectCalled, "SFTP should be disconnected/disposed after execution")
+    End Sub
+
+    <TestMethod>
+    Public Sub MultipleRuns_EachGetsFreshSftpInstance()
+        ' Verify the factory creates a new instance each time
+        Dim instanceCount As Integer = 0
+        Dim engine As New UpdaterEngine(_mockEmail, Function()
+                                                         instanceCount += 1
+                                                         Return New MockSftpService()
+                                                     End Function)
+
+        Try
+            engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress).Wait()
+        Catch
+        End Try
+        Try
+            engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress).Wait()
+        Catch
+        End Try
+
+        Assert.AreEqual(2, instanceCount, "Factory should be called once per PerformUpdateCheck")
+    End Sub
+
+End Class

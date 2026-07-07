@@ -239,4 +239,36 @@ Public Class UpdaterEngine
             ' Clean up hash file
             Try
                 File.Delete(hashPath)
-            
+            Catch
+            End Try
+        Catch ex As UpdateException
+            Throw ' Re-throw hash mismatch
+        Catch ex As Exception
+            Logger.Log($"Hash verification skipped: {ex.Message}", Logger.LogLevel.Warning)
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' Retry an async operation up to MAX_RETRIES times with Task.Delay between attempts.
+    ''' Does not block thread pool threads.
+    ''' </summary>
+    Private Async Function RetryOperationAsync(Of T)(operation As Func(Of Task(Of T)), operationName As String) As Task(Of T)
+        Dim lastEx As Exception = Nothing
+        For attempt As Integer = 1 To MAX_RETRIES
+            Dim shouldDelay As Boolean = False
+            Try
+                Return Await operation()
+            Catch ex As Exception
+                lastEx = ex
+                Logger.Log($"Attempt {attempt}/{MAX_RETRIES} for {operationName} failed: {ex.Message}", Logger.LogLevel.Warning)
+                shouldDelay = (attempt < MAX_RETRIES)
+            End Try
+            ' Await cannot be inside Catch in VB.NET (.NET Framework)
+            If shouldDelay Then
+                Await Task.Delay(RETRY_DELAY_MS * attempt)
+            End If
+        Next
+        Throw New UpdateException(UpdateErrorCode.ConnectionFailed, $"{operationName} failed after {MAX_RETRIES} attempts", lastEx)
+    End Function
+
+End Class

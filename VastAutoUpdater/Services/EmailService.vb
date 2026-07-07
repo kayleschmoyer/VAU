@@ -65,4 +65,12 @@ Public Class EmailService
                     client.Timeout = 30000 ' 30 second timeout
                     client.Send(msg)
                 End Using
-       
+            End Using
+
+            Logger.Log($"Notification email sent: {subject}", Logger.LogLevel.Info)
+
+        Catch ex As Exception
+            Logger.Log($"Failed to send notification email: {ex.Message}", Logger.LogLevel.Warning)
+        End Try
+    End Sub
+End Class

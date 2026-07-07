@@ -167,4 +167,37 @@ Public Class SftpService
             Dim fi As New FileInfo(tempPath)
             If Not fi.Exists OrElse fi.Length = 0 Then
                 Logger.Log($"Download produced empty file: {tempPath}", Logger.LogLevel.Error)
-          
+                Return False
+            End If
+
+            ' Atomic rename: delete target if it exists, then move temp into place
+            If File.Exists(localPath) Then File.Delete(localPath)
+            File.Move(tempPath, localPath)
+
+            Logger.Log($"Download completed: {localPath} ({fi.Length} bytes)", Logger.LogLevel.Info)
+            Return True
+        Catch ex As Exception
+            ' Clean up partial download on failure
+            Try
+                If File.Exists(tempPath) Then File.Delete(tempPath)
+            Catch
+            End Try
+            Throw
+        End Try
+    End Function
+
+    ''' <summary>
+    ''' Disconnect and release the SFTP client resources.
+    ''' </summary>
+    Public Sub Dispose() Implements ISftpService.Dispose
+        If Not disposed Then
+            Disconnect()
+            If client IsNot Nothing Then
+                client.Dispose()
+                client = Nothing
+            End If
+            disposed = True
+            GC.SuppressFinalize(Me)
+        End If
+    End Sub
+End Class
