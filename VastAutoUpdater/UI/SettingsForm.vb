@@ -2,6 +2,7 @@ Option Strict On
 
 Imports System.Configuration
 Imports System.Data.SqlClient
+Imports System.Drawing.Drawing2D
 Imports System.Windows.Forms
 
 ''' <summary>
@@ -162,4 +163,4 @@ Public Class SettingsForm
     Private Sub BtnTestConnection_Click(sender As Object, e As EventArgs)
         Dim server As String = txtDatabaseServer.Text.Trim()
         If String.IsNullOrWhiteSpace(server) Then
-            MessageBox.Show("Enter a database server instance firs
+            ShowConnectionHelp("N
