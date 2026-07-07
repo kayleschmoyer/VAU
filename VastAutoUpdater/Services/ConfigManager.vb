@@ -65,6 +65,30 @@ Public Module ConfigManager
         End Get
     End Property
 
+    Public ReadOnly Property DashboardApiUrl As String
+        Get
+            Return GetSetting("DashboardApiUrl", "")
+        End Get
+    End Property
+
+    Public ReadOnly Property DashboardApiKey As String
+        Get
+            Return GetProtectedSetting("DashboardApiKey", "")
+        End Get
+    End Property
+
+    Public ReadOnly Property CustomerName As String
+        Get
+            Return GetSetting("CustomerName", "")
+        End Get
+    End Property
+
+    Public ReadOnly Property SiteName As String
+        Get
+            Return GetSetting("SiteName", "")
+        End Get
+    End Property
+
     ''' <summary>
     ''' Safely retrieve a string setting with a default fallback.
     ''' </summary>
@@ -151,7 +175,7 @@ Public Module ConfigManager
     ''' Already-encrypted values (prefixed with "enc:") are left unchanged.
     ''' </summary>
     Public Sub EncryptOnFirstRun()
-        Dim credentialKeys As String() = {"SftpUsername", "SftpPassword", "SmtpUsername", "SmtpPassword"}
+        Dim credentialKeys As String() = {"SftpUsername", "SftpPassword", "SmtpUsername", "SmtpPassword", "DashboardApiKey"}
         Dim needsSave As Boolean = False
 
         Try

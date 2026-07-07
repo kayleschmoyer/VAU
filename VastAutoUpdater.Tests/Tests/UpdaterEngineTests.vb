@@ -70,8 +70,31 @@ Public Class UpdaterEngineTests
         End Sub
     End Class
 
+    ''' <summary>
+    ''' Mock dashboard service for testing without HTTP.
+    ''' </summary>
+    Private Class MockDashboardService
+        Implements IDashboardService
+
+        Public Property Events As New List(Of DashboardEventType)()
+        Public Property LastVersion As String = String.Empty
+        Public Property LastTargetVersion As String = String.Empty
+        Public Property LastMessage As String = String.Empty
+
+        Public Sub ReportEvent(eventType As DashboardEventType,
+                               Optional version As String = "",
+                               Optional targetVersion As String = "",
+                               Optional message As String = "") Implements IDashboardService.ReportEvent
+            Events.Add(eventType)
+            LastVersion = version
+            LastTargetVersion = targetVersion
+            LastMessage = message
+        End Sub
+    End Class
+
     Private _mockSftp As MockSftpService
     Private _mockEmail As MockEmailService
+    Private _mockDashboard As MockDashboardService
     Private _engine As UpdaterEngine
     Private _lastProgress As Integer
     Private _lastStatus As String
@@ -80,7 +103,8 @@ Public Class UpdaterEngineTests
     Public Sub Setup()
         _mockSftp = New MockSftpService()
         _mockEmail = New MockEmailService()
-        _engine = New UpdaterEngine(_mockEmail, Function() _mockSftp)
+        _mockDashboard = New MockDashboardService()
+        _engine = New UpdaterEngine(_mockEmail, Function() _mockSftp, _mockDashboard)
         _lastProgress = 0
         _lastStatus = String.Empty
     End Sub
@@ -147,6 +171,38 @@ Public Class UpdaterEngineTests
 
         Assert.IsTrue(_mockEmail.SendCalled, "Email should be sent even when update fails")
         Assert.IsFalse(_mockEmail.LastSuccess, "Email should report failure")
+    End Sub
+
+    <TestMethod>
+    Public Sub DashboardService_ReportsFailureOnError()
+        _mockSftp.ShouldThrowOnConnect = True
+
+        Try
+            _engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress).Wait()
+        Catch ex As AggregateException
+            ' Expected
+        End Try
+
+        Assert.IsTrue(_mockDashboard.Events.Contains(DashboardEventType.UpdateFailure),
+                      "Dashboard should receive update_failure when the update fails")
+        Assert.IsFalse(String.IsNullOrEmpty(_mockDashboard.LastMessage),
+                       "Failure report should include a message")
+    End Sub
+
+    <TestMethod>
+    Public Sub DashboardService_NoUpdateEventsWhenNoUpdateAvailable()
+        _mockSftp.LatestVersion = "0.0.0"
+
+        Try
+            _engine.PerformUpdateCheck("user", "pass", AddressOf TrackProgress).Wait()
+        Catch ex As AggregateException
+            ' VAST.exe may not exist in the test environment
+        End Try
+
+        Assert.IsFalse(_mockDashboard.Events.Contains(DashboardEventType.UpdateStart),
+                       "update_start should not be reported when no update is needed")
+        Assert.IsFalse(_mockDashboard.Events.Contains(DashboardEventType.UpdateSuccess),
+                       "update_success should not be reported when no update is needed")
     End Sub
 
     <TestMethod>

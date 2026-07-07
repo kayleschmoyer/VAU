@@ -4,16 +4,21 @@ Imports System.Configuration
 Imports System.Windows.Forms
 
 ''' <summary>
-''' Simple settings dialog for configuring email recipients.
+''' Simple settings dialog for configuring email recipients and the
+''' customer/site identity reported to the VAU-Dashboard.
 ''' Reads and writes directly to the application's .exe.config file.
 ''' </summary>
 Public Class SettingsForm
     Inherits Form
 
     Private txtEmailTo As TextBox
+    Private txtCustomerName As TextBox
+    Private txtSiteName As TextBox
     Private btnSave As Button
     Private btnCancel As Button
     Private lblEmailTo As Label
+    Private lblCustomerName As Label
+    Private lblSiteName As Label
 
     Private Shared ReadOnly Magenta As Color = Color.FromArgb(237, 1, 127)
 
@@ -24,7 +29,7 @@ Public Class SettingsForm
 
     Private Sub InitializeSettingsForm()
         Me.Text = "Settings"
-        Me.Size = New Size(420, 200)
+        Me.Size = New Size(420, 320)
         Me.FormBorderStyle = FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
         Me.MinimizeBox = False
@@ -47,9 +52,39 @@ Public Class SettingsForm
             .BorderStyle = BorderStyle.FixedSingle
         }
 
+        lblCustomerName = New Label() With {
+            .Text = "CUSTOMER NAME",
+            .Location = New Point(20, 80),
+            .Size = New Size(360, 18),
+            .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
+            .ForeColor = Color.FromArgb(51, 51, 51)
+        }
+
+        txtCustomerName = New TextBox() With {
+            .Location = New Point(20, 102),
+            .Size = New Size(360, 26),
+            .Font = New Font("Segoe UI", 11.0!),
+            .BorderStyle = BorderStyle.FixedSingle
+        }
+
+        lblSiteName = New Label() With {
+            .Text = "SITE NAME",
+            .Location = New Point(20, 140),
+            .Size = New Size(360, 18),
+            .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
+            .ForeColor = Color.FromArgb(51, 51, 51)
+        }
+
+        txtSiteName = New TextBox() With {
+            .Location = New Point(20, 162),
+            .Size = New Size(360, 26),
+            .Font = New Font("Segoe UI", 11.0!),
+            .BorderStyle = BorderStyle.FixedSingle
+        }
+
         btnSave = New Button() With {
             .Text = "SAVE",
-            .Location = New Point(210, 110),
+            .Location = New Point(210, 220),
             .Size = New Size(80, 36),
             .FlatStyle = FlatStyle.Flat,
             .BackColor = Magenta,
@@ -61,7 +96,7 @@ Public Class SettingsForm
 
         btnCancel = New Button() With {
             .Text = "CANCEL",
-            .Location = New Point(300, 110),
+            .Location = New Point(300, 220),
             .Size = New Size(80, 36),
             .FlatStyle = FlatStyle.Flat,
             .BackColor = Color.FromArgb(200, 200, 200),
@@ -74,7 +109,8 @@ Public Class SettingsForm
         AddHandler btnSave.Click, AddressOf BtnSave_Click
         AddHandler btnCancel.Click, AddressOf BtnCancel_Click
 
-        Me.Controls.AddRange({lblEmailTo, txtEmailTo, btnSave, btnCancel})
+        Me.Controls.AddRange({lblEmailTo, txtEmailTo, lblCustomerName, txtCustomerName,
+                              lblSiteName, txtSiteName, btnSave, btnCancel})
         Me.AcceptButton = btnSave
         Me.CancelButton = btnCancel
     End Sub
@@ -85,6 +121,9 @@ Public Class SettingsForm
             If Not String.IsNullOrEmpty(emailTo) Then
                 txtEmailTo.Text = emailTo
             End If
+
+            txtCustomerName.Text = ConfigManager.CustomerName
+            txtSiteName.Text = ConfigManager.SiteName
         Catch ex As Exception
             Logger.Log($"Error loading settings: {ex.Message}", Logger.LogLevel.Error)
         End Try
@@ -95,6 +134,8 @@ Public Class SettingsForm
             Dim config As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None)
 
             SetOrAddSetting(config, "EmailTo", txtEmailTo.Text.Trim())
+            SetOrAddSetting(config, "CustomerName", txtCustomerName.Text.Trim())
+            SetOrAddSetting(config, "SiteName", txtSiteName.Text.Trim())
 
             config.Save(ConfigurationSaveMode.Modified)
             ConfigurationManager.RefreshSection("appSettings")

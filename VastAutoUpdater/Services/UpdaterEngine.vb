@@ -11,6 +11,7 @@ Imports System.Threading
 Public Class UpdaterEngine
     Private ReadOnly _emailService As IEmailService
     Private ReadOnly _sftpFactory As Func(Of ISftpService)
+    Private ReadOnly _dashboardService As IDashboardService
     Private Const MAX_RETRIES As Integer = 3
     Private Const RETRY_DELAY_MS As Integer = 5000
 
@@ -20,14 +21,17 @@ Public Class UpdaterEngine
     Public Sub New()
         _emailService = New EmailService()
         _sftpFactory = Function() New SftpService()
+        _dashboardService = New DashboardService()
     End Sub
 
     ''' <summary>
     ''' Create an UpdaterEngine with injected dependencies for testing.
     ''' </summary>
-    Public Sub New(emailService As IEmailService, sftpFactory As Func(Of ISftpService))
+    Public Sub New(emailService As IEmailService, sftpFactory As Func(Of ISftpService),
+                   Optional dashboardService As IDashboardService = Nothing)
         _emailService = emailService
         _sftpFactory = sftpFactory
+        _dashboardService = If(dashboardService, New DashboardService())
     End Sub
 
     ''' <summary>
@@ -37,6 +41,9 @@ Public Class UpdaterEngine
         Dim success As Boolean = False
         Dim message As String = String.Empty
         Dim caughtEx As Exception = Nothing
+        Dim currentVersion As String = String.Empty
+        Dim targetVersion As String = String.Empty
+        Dim updateStarted As Boolean = False
 
         Using sftp As ISftpService = _sftpFactory()
             Try
@@ -48,7 +55,7 @@ Public Class UpdaterEngine
                     Throw New UpdateException(UpdateErrorCode.VastNotFound, "VAST.exe not found on any drive")
                 End If
 
-                Dim currentVersion As String = VersionService.GetFileVersion(vastPath)
+                currentVersion = VersionService.GetFileVersion(vastPath)
                 Logger.Log($"Current VAST version: {currentVersion}", Logger.LogLevel.Info)
 
                 Dim parsedCurrent As Version = Nothing
@@ -95,6 +102,12 @@ Public Class UpdaterEngine
 
                 cancelToken.ThrowIfCancellationRequested()
                 Logger.Log($"Update available: {currentVersion} -> {latest}", Logger.LogLevel.Info)
+
+                ' Report update start to the dashboard (fire-and-forget)
+                targetVersion = latest
+                updateStarted = True
+                _dashboardService.ReportEvent(DashboardEventType.UpdateStart, currentVersion, targetVersion)
+
                 progress(20, $"Downloading version {latest}...")
 
                 InstallerPathService.EnsureUpdateFolderExists()
@@ -179,6 +192,17 @@ Public Class UpdaterEngine
                 message = ex.Message
             End Try
         End Using ' SftpService disconnects and disposes here
+
+        ' Report outcome to the dashboard (fire-and-forget, never blocks the update)
+        Try
+            If caughtEx IsNot Nothing Then
+                _dashboardService.ReportEvent(DashboardEventType.UpdateFailure, currentVersion, targetVersion, message)
+            ElseIf updateStarted AndAlso success Then
+                _dashboardService.ReportEvent(DashboardEventType.UpdateSuccess, currentVersion, targetVersion, message)
+            End If
+        Catch dashEx As Exception
+            Logger.Log($"Failed to report dashboard status: {dashEx.Message}", Logger.LogLevel.Warning)
+        End Try
 
         ' Send summary email
         Try

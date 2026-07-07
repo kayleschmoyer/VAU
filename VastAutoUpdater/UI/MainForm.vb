@@ -9,6 +9,7 @@ Imports System.Threading
 Public Class MainForm
 
     Private engine As New UpdaterEngine()
+    Private dashboardService As IDashboardService = New DashboardService()
     Private runSilently As Boolean
     Private isDragging As Boolean = False
     Private dragStart As Point
@@ -215,9 +216,25 @@ Public Class MainForm
     End Sub
 
     ''' <summary>
+    ''' Send a heartbeat event to the dashboard so the machine reports in
+    ''' on every silent run, even when no update is needed.
+    ''' </summary>
+    Private Sub SendHeartbeat()
+        Try
+            Dim exePath As String = VersionService.FindVastExecutable()
+            Dim version As String = If(String.IsNullOrEmpty(exePath), String.Empty, VersionService.GetFileVersion(exePath))
+            dashboardService.ReportEvent(DashboardEventType.Heartbeat, version)
+        Catch ex As Exception
+            Logger.Log($"Failed to send heartbeat: {ex.Message}", Logger.LogLevel.Warning)
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' Execute the update in silent (headless) mode. Exits with code 0 on success, 1 on failure.
+    ''' Always sends a dashboard heartbeat, even if no update is needed.
     ''' </summary>
     Private Async Sub RunSilentUpdate()
+        SendHeartbeat()
         Try
             Await RunUpdate(CancellationToken.None)
             Logger.Log("Silent mode finished successfully, exiting", Logger.LogLevel.Info)
