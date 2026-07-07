@@ -44,4 +44,4 @@ Filename: "{app}\VastAutoUpdater.exe"; Description: "Launch VAST Auto Updater"; 
 
 [UninstallRun]
 ; Remove the scheduled task on uninstall
-Filename: "schtasks.exe"; Parameters: "/Delete /TN ""VAST Auto Updater"" /F"; Flags: runhidden
+Filename: "schtasks.exe"; Parameters: "/Delete /TN ""VAST Auto Updater"" /F"; Flags: runhidden; RunOnceId: "RemoveScheduledTask"
