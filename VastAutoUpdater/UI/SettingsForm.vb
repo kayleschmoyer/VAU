@@ -160,7 +160,4 @@ Public Class SettingsForm
     ''' <summary>
     ''' Test the SQL connection and auto-fill Customer Name and Site Number from the query result.
     ''' </summary>
-    Private Sub BtnTestConnection_Click(sender As Object, e As EventArgs)
-        Dim server As String = txtDatabaseServer.Text.Trim()
-        If String.IsNullOrWhiteSpace(server) Then
-            ShowConnectionHelp("N
+    Private Sub BtnTestConnection_Click(sender As Object
