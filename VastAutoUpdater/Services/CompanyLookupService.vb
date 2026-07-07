@@ -3,37 +3,36 @@ Option Strict On
 Imports System.Data.SqlClient
 
 ''' <summary>
-''' Queries the local VastOffice database to retrieve company information.
+''' Queries the VastOffice database to retrieve company information (read-only).
 ''' Used to dynamically populate CustomerName and SiteName for dashboard reporting.
+''' The database server instance is configurable via the DatabaseServer App.config key.
+''' Credentials are always vastnr/snowdrift (SQL authentication).
 ''' </summary>
 Public Class CompanyLookupService
 
-    Private Const CONNECTION_STRING As String = "Server=.\SQLEXPRESS;Database=VastOffice;Integrated Security=True;Connection Timeout=5;"
+    ''' <summary>
+    ''' Build a read-only connection string for the configured database server.
+    ''' Uses SQL authentication with the standard vastnr account.
+    ''' ApplicationIntent=ReadOnly signals read-only intent to the server.
+    ''' </summary>
+    Private Shared Function BuildConnectionString() As String
+        Dim server As String = ConfigManager.DatabaseServer
+        If String.IsNullOrWhiteSpace(server) Then
+            Logger.Log("DatabaseServer not configured - skipping company lookup", Logger.LogLevel.Warning)
+            Return String.Empty
+        End If
+        Return $"Server={server};Database=VastOffice;User Id=vastnr;Password=snowdrift;Connection Timeout=5;ApplicationIntent=ReadOnly;"
+    End Function
 
     ''' <summary>
     ''' Look up the company name and number from the COMPANY table.
-    ''' Returns a tuple of (Name, CompanyNumber). Both empty if lookup fails.
+    ''' Returns a tuple of (Name, CompanyNumber). Both empty if lookup fails or server not configured.
     ''' </summary>
     Public Shared Function GetCompanyInfo() As (Name As String, CompanyNumber As String)
         Try
-            Using conn As New SqlConnection(CONNECTION_STRING)
+            Dim connStr As String = BuildConnectionString()
+            If String.IsNullOrEmpty(connStr) Then Return (String.Empty, String.Empty)
+
+            Using conn As New SqlConnection(connStr)
                 conn.Open()
-                Using cmd As New SqlCommand("SELECT TOP 1 NAME, COMPANY_NUMBER FROM COMPANY", conn)
-                    Using reader As SqlDataReader = cmd.ExecuteReader()
-                        If reader.Read() Then
-                            Dim name As String = If(reader.IsDBNull(0), String.Empty, reader.GetString(0).Trim())
-                            Dim companyNumber As String = If(reader.IsDBNull(1), String.Empty, reader(1).ToString().Trim())
-                            Logger.Log($"Company lookup: {name} (#{companyNumber})", Logger.LogLevel.Info)
-                            Return (name, companyNumber)
-                        End If
-                    End Using
-                End Using
-            End Using
-        Catch ex As Exception
-            Logger.Log($"Company lookup failed: {ex.Message}", Logger.LogLevel.Warning)
-        End Try
-
-        Return (String.Empty, String.Empty)
-    End Function
-
-End Class
+             

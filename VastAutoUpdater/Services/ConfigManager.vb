@@ -77,6 +77,12 @@ Public Module ConfigManager
         End Get
     End Property
 
+    Public ReadOnly Property DatabaseServer As String
+        Get
+            Return GetSetting("DatabaseServer", "")
+        End Get
+    End Property
+
     Private Shared _companyInfoLoaded As Boolean = False
     Private Shared _cachedCustomerName As String = Nothing
     Private Shared _cachedSiteName As String = Nothing
@@ -235,6 +241,4 @@ Public Module ConfigManager
         Dim missing As New List(Of String)()
 
         If String.IsNullOrWhiteSpace(SftpHost) Then missing.Add("SftpHost")
-        If String.IsNullOrWhiteSpace(SftpUsername) Then missing.Add("SftpUsername")
-        If String.IsNullOrWhiteSpace(SftpPassword) Then missing.Add("SftpPassword")
-        If String.IsNullOrWhiteS
+        If String.IsNullOrWhiteSpace(SftpUsernam

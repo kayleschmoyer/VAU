@@ -1,11 +1,12 @@
 Option Strict On
 
 Imports System.Configuration
+Imports System.Data.SqlClient
 Imports System.Windows.Forms
 
 ''' <summary>
-''' Simple settings dialog for configuring email recipients and the
-''' customer/site identity reported to the VAU-Dashboard.
+''' Settings dialog for configuring email recipients, customer/site identity,
+''' and the SQL Server instance used for VastOffice database lookups.
 ''' Reads and writes directly to the application's .exe.config file.
 ''' </summary>
 Public Class SettingsForm
@@ -14,13 +15,18 @@ Public Class SettingsForm
     Private txtEmailTo As TextBox
     Private txtCustomerName As TextBox
     Private txtSiteName As TextBox
+    Private txtDatabaseServer As TextBox
+    Private btnTestConnection As Button
     Private btnSave As Button
     Private btnCancel As Button
     Private lblEmailTo As Label
     Private lblCustomerName As Label
     Private lblSiteName As Label
+    Private lblDatabaseServer As Label
+    Private lblDbHint As Label
 
     Private Shared ReadOnly Magenta As Color = Color.FromArgb(237, 1, 127)
+    Private Shared ReadOnly Charcoal As Color = Color.FromArgb(51, 51, 51)
 
     Public Sub New()
         InitializeSettingsForm()
@@ -29,7 +35,7 @@ Public Class SettingsForm
 
     Private Sub InitializeSettingsForm()
         Me.Text = "Settings"
-        Me.Size = New Size(420, 320)
+        Me.Size = New Size(420, 420)
         Me.FormBorderStyle = FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
         Me.MinimizeBox = False
@@ -42,7 +48,7 @@ Public Class SettingsForm
             .Location = New Point(20, 20),
             .Size = New Size(360, 18),
             .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-            .ForeColor = Color.FromArgb(51, 51, 51)
+            .ForeColor = Charcoal
         }
 
         txtEmailTo = New TextBox() With {
@@ -57,7 +63,7 @@ Public Class SettingsForm
             .Location = New Point(20, 80),
             .Size = New Size(360, 18),
             .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-            .ForeColor = Color.FromArgb(51, 51, 51)
+            .ForeColor = Charcoal
         }
 
         txtCustomerName = New TextBox() With {
@@ -72,7 +78,7 @@ Public Class SettingsForm
             .Location = New Point(20, 140),
             .Size = New Size(360, 18),
             .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
-            .ForeColor = Color.FromArgb(51, 51, 51)
+            .ForeColor = Charcoal
         }
 
         txtSiteName = New TextBox() With {
@@ -82,9 +88,44 @@ Public Class SettingsForm
             .BorderStyle = BorderStyle.FixedSingle
         }
 
+        lblDatabaseServer = New Label() With {
+            .Text = "DATABASE SERVER",
+            .Location = New Point(20, 200),
+            .Size = New Size(360, 18),
+            .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
+            .ForeColor = Charcoal
+        }
+
+        txtDatabaseServer = New TextBox() With {
+            .Location = New Point(20, 222),
+            .Size = New Size(260, 26),
+            .Font = New Font("Segoe UI", 11.0!),
+            .BorderStyle = BorderStyle.FixedSingle
+        }
+
+        btnTestConnection = New Button() With {
+            .Text = "TEST",
+            .Location = New Point(290, 222),
+            .Size = New Size(90, 26),
+            .FlatStyle = FlatStyle.Flat,
+            .BackColor = Color.FromArgb(0, 150, 80),
+            .ForeColor = Color.White,
+            .Font = New Font("Segoe UI", 8.0!, FontStyle.Bold),
+            .Cursor = Cursors.Hand
+        }
+        btnTestConnection.FlatAppearance.BorderSize = 0
+
+        lblDbHint = New Label() With {
+            .Text = "e.g. .\SQLEXPRESS  or  SERVERNAME\SQLEXPRESS  or  SERVERNAME",
+            .Location = New Point(20, 252),
+            .Size = New Size(360, 16),
+            .Font = New Font("Segoe UI", 8.0!, FontStyle.Italic),
+            .ForeColor = Color.FromArgb(140, 140, 140)
+        }
+
         btnSave = New Button() With {
             .Text = "SAVE",
-            .Location = New Point(210, 220),
+            .Location = New Point(210, 310),
             .Size = New Size(80, 36),
             .FlatStyle = FlatStyle.Flat,
             .BackColor = Magenta,
@@ -96,21 +137,23 @@ Public Class SettingsForm
 
         btnCancel = New Button() With {
             .Text = "CANCEL",
-            .Location = New Point(300, 220),
+            .Location = New Point(300, 310),
             .Size = New Size(80, 36),
             .FlatStyle = FlatStyle.Flat,
             .BackColor = Color.FromArgb(200, 200, 200),
-            .ForeColor = Color.FromArgb(51, 51, 51),
+            .ForeColor = Charcoal,
             .Font = New Font("Segoe UI", 9.0!, FontStyle.Bold),
             .Cursor = Cursors.Hand
         }
         btnCancel.FlatAppearance.BorderSize = 0
 
+        AddHandler btnTestConnection.Click, AddressOf BtnTestConnection_Click
         AddHandler btnSave.Click, AddressOf BtnSave_Click
         AddHandler btnCancel.Click, AddressOf BtnCancel_Click
 
         Me.Controls.AddRange({lblEmailTo, txtEmailTo, lblCustomerName, txtCustomerName,
-                              lblSiteName, txtSiteName, btnSave, btnCancel})
+                              lblSiteName, txtSiteName, lblDatabaseServer, txtDatabaseServer,
+                              btnTestConnection, lblDbHint, btnSave, btnCancel})
         Me.AcceptButton = btnSave
         Me.CancelButton = btnCancel
     End Sub
@@ -122,48 +165,5 @@ Public Class SettingsForm
                 txtEmailTo.Text = emailTo
             End If
 
-            txtCustomerName.Text = ConfigManager.CustomerName
-            txtSiteName.Text = ConfigManager.SiteName
-        Catch ex As Exception
-            Logger.Log($"Error loading settings: {ex.Message}", Logger.LogLevel.Error)
-        End Try
-    End Sub
-
-    Private Sub BtnSave_Click(sender As Object, e As EventArgs)
-        Try
-            Dim config As Configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None)
-
-            SetOrAddSetting(config, "EmailTo", txtEmailTo.Text.Trim())
-            SetOrAddSetting(config, "CustomerName", txtCustomerName.Text.Trim())
-            SetOrAddSetting(config, "SiteName", txtSiteName.Text.Trim())
-
-            config.Save(ConfigurationSaveMode.Modified)
-            ConfigurationManager.RefreshSection("appSettings")
-
-            Logger.Log("Settings saved successfully", Logger.LogLevel.Info)
-            Me.DialogResult = DialogResult.OK
-            Me.Close()
-        Catch ex As Exception
-            Logger.Log($"Error saving settings: {ex.Message}", Logger.LogLevel.Error)
-            MessageBox.Show($"Failed to save settings: {ex.Message}", "Error",
-                           MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
-
-    Private Sub BtnCancel_Click(sender As Object, e As EventArgs)
-        Me.DialogResult = DialogResult.Cancel
-        Me.Close()
-    End Sub
-
-    ''' <summary>
-    ''' Sets an appSettings key, creating it if it doesn't exist.
-    ''' </summary>
-    Private Shared Sub SetOrAddSetting(config As Configuration, key As String, value As String)
-        If config.AppSettings.Settings(key) IsNot Nothing Then
-            config.AppSettings.Settings(key).Value = value
-        Else
-            config.AppSettings.Settings.Add(key, value)
-        End If
-    End Sub
-
-End Class
+            txtCustomerName.Text = ConfigurationManager.AppSettings("CustomerName")
+            txtSiteName.Text
