@@ -1,6 +1,6 @@
 [Setup]
 AppName=VAST Auto Updater
-AppVersion=1.1.0
+AppVersion=1.1.1
 AppPublisher=VAST Retail
 AppSupportURL=https://github.com/kayleschmoyer/VAU
 AppUpdatesURL=https://github.com/kayleschmoyer/VAU/releases

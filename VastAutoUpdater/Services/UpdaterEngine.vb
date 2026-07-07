@@ -14,6 +14,8 @@ Public Class UpdaterEngine
     Private ReadOnly _dashboardService As IDashboardService
     Private Const MAX_RETRIES As Integer = 3
     Private Const RETRY_DELAY_MS As Integer = 5000
+    Private Const INSTALLER_WAIT_TIMEOUT_MS As Integer = 30 * 60 * 1000
+    Private Const INSTALLER_POLL_MS As Integer = 5000
 
     ''' <summary>
     ''' Create an UpdaterEngine with default production services.
@@ -44,6 +46,7 @@ Public Class UpdaterEngine
         Dim currentVersion As String = String.Empty
         Dim targetVersion As String = String.Empty
         Dim updateStarted As Boolean = False
+        Dim verifiedVersion As String = String.Empty
 
         ' Honor cancellation before doing any work (drive scan, SFTP connect)
         cancelToken.ThrowIfCancellationRequested()
@@ -151,10 +154,11 @@ Public Class UpdaterEngine
                 Logger.Log($"Download verified: {installer} ({installerInfo.Length} bytes)", Logger.LogLevel.Info)
                 progress(95, "Launching installer...")
 
-                ' Launch installer unattended and wait briefly to confirm it started.
-                ' VAST patch installers accept /silent for a no-UI install, which
-                ' also keeps the 2:00 AM SYSTEM scheduled task fully headless.
+                ' Launch installer unattended. VAST patch installers accept /silent
+                ' for a no-UI install, which also keeps the 2:00 AM SYSTEM
+                ' scheduled task fully headless.
                 Dim proc As Process = Nothing
+                Dim installerExited As Boolean = False
                 Try
                     Logger.Log($"Launching installer: ""{installer}"" /silent", Logger.LogLevel.Info)
                     proc = Process.Start(New ProcessStartInfo With {
@@ -164,29 +168,51 @@ Public Class UpdaterEngine
                     })
 
                     If proc IsNot Nothing Then
-                        Dim exited As Boolean = Await Task.Run(Function() proc.WaitForExit(10000))
-                        If exited AndAlso proc.ExitCode <> 0 Then
+                        ' Wait for the patch to finish (Setup64/msiexec can take
+                        ' many minutes). Cancellation stops the wait, not the patch.
+                        progress(96, "Installing patch...")
+                        Dim waitedMs As Integer = 0
+                        While waitedMs < INSTALLER_WAIT_TIMEOUT_MS
+                            If cancelToken.IsCancellationRequested Then Exit While
+                            installerExited = Await Task.Run(Function() proc.WaitForExit(INSTALLER_POLL_MS))
+                            If installerExited Then Exit While
+                            waitedMs += INSTALLER_POLL_MS
+                            Dim mins As Integer = waitedMs \ 60000
+                            progress(97, If(mins > 0, $"Installing patch... ({mins} min elapsed)", "Installing patch..."))
+                        End While
+
+                        If installerExited AndAlso proc.ExitCode <> 0 Then
                             Throw New UpdateException(UpdateErrorCode.InstallerFailed, $"Installer exited with error code {proc.ExitCode}")
-                        ElseIf exited Then
-                            success = True
-                            message = $"Update {latest} downloaded and installer completed"
-                            Logger.Log($"Installer completed: {installer} (exit code 0)", Logger.LogLevel.Info)
-                        Else
-                            success = True
-                            message = $"Update {latest} downloaded and installer launched"
-                            Logger.Log($"Installer still running: {installer} (PID: {proc.Id})", Logger.LogLevel.Info)
                         End If
                     End If
+                Catch ex As UpdateException
+                    Throw
                 Catch ex As Exception
                     Throw New UpdateException(UpdateErrorCode.InstallerFailed, $"Failed to launch installer: {ex.Message}", ex)
                 Finally
                     If proc IsNot Nothing Then proc.Dispose()
                 End Try
 
-                ' Clean up old installers
+                ' Clean up old installers (never touches the current version's file)
                 InstallerPathService.CleanupOldInstallers(latest)
 
-                progress(100, "Update complete.")
+                ' Only claim completion when the on-disk VAST version proves it.
+                ' Otherwise be honest: the patch is still working in the background.
+                verifiedVersion = TryGetInstalledVersion(parsedLatest)
+                success = True
+                If verifiedVersion <> String.Empty Then
+                    message = $"Update {latest} installed and verified (VAST is now {verifiedVersion})"
+                    Logger.Log(message, Logger.LogLevel.Info)
+                    progress(100, "Update complete.")
+                ElseIf installerExited Then
+                    message = $"Update {latest} installer finished, but the VAST version has not changed yet — the patch may still be finalizing"
+                    Logger.Log(message, Logger.LogLevel.Warning)
+                    progress(100, "Patch is finishing in the background...")
+                Else
+                    message = $"Update {latest} is still installing in the background"
+                    Logger.Log(message, Logger.LogLevel.Info)
+                    progress(100, "Patch is installing in the background...")
+                End If
 
             Catch ex As OperationCanceledException
                 ' Let cancellation propagate directly — do not wrap or email
@@ -205,8 +231,16 @@ Public Class UpdaterEngine
         Try
             If caughtEx IsNot Nothing Then
                 _dashboardService.ReportEvent(DashboardEventType.UpdateFailure, currentVersion, targetVersion, message)
+            ElseIf updateStarted AndAlso success AndAlso verifiedVersion <> String.Empty Then
+                ' Send the verified NEW version so the dashboard reflects the
+                ' machine's actual state, not the pre-update version
+                _dashboardService.ReportEvent(DashboardEventType.UpdateSuccess, verifiedVersion, targetVersion, message)
             ElseIf updateStarted AndAlso success Then
-                _dashboardService.ReportEvent(DashboardEventType.UpdateSuccess, currentVersion, targetVersion, message)
+                ' Patch still running in the background — leave update_start as
+                ' the machine's latest state; the next run's heartbeat reports
+                ' the new version once the patch has landed. Claiming success
+                ' now would show a completed update that hasn't finished.
+                Logger.Log("Skipping update_success report — patch not yet verified on disk", Logger.LogLevel.Info)
             End If
         Catch dashEx As Exception
             Logger.Log($"Failed to report dashboard status: {dashEx.Message}", Logger.LogLevel.Warning)
@@ -226,6 +260,27 @@ Public Class UpdaterEngine
             End If
             Throw New UpdateException(UpdateErrorCode.Unknown, message, caughtEx)
         End If
+    End Function
+
+    ''' <summary>
+    ''' Read the installed VAST version from disk and return it when it is at
+    ''' least the expected version — proof the patch actually applied.
+    ''' Returns an empty string when the version has not changed yet (patch
+    ''' still running) or when it cannot be determined.
+    ''' </summary>
+    Private Shared Function TryGetInstalledVersion(expected As Version) As String
+        Try
+            Dim exePath As String = VersionService.FindVastExecutable()
+            If String.IsNullOrEmpty(exePath) Then Return String.Empty
+            Dim fileVersion As String = VersionService.GetFileVersion(exePath)
+            Dim parsed As Version = Nothing
+            If Version.TryParse(fileVersion, parsed) AndAlso parsed >= expected Then
+                Return fileVersion
+            End If
+        Catch ex As Exception
+            Logger.Log($"Post-install version check failed: {ex.Message}", Logger.LogLevel.Warning)
+        End Try
+        Return String.Empty
     End Function
 
     ''' <summary>

@@ -205,6 +205,19 @@ Public Class MainForm
             Else
                 lblCurrentVersion.Text = "Current version: not found"
             End If
+
+            ' Surface the saved deployment credentials: show the username and
+            ' hint that the password is on file (without exposing it). Anything
+            ' typed here overrides the saved values for this run.
+            If Not runSilently Then
+                If Not String.IsNullOrEmpty(ConfigManager.SftpUsername) Then
+                    txtSftpUsername.Text = ConfigManager.SftpUsername
+                End If
+                If Not String.IsNullOrEmpty(ConfigManager.SftpPassword) Then
+                    txtSftpPassword.CueText = "Using saved password"
+                End If
+            End If
+
             SetStatus("Ready for update check", StatusKind.Ready)
         Catch ex As Exception
             Logger.Log($"Error on load: {ex.Message}", Logger.LogLevel.Error)
@@ -326,8 +339,13 @@ Public Class MainForm
             pass = ConfigManager.SftpPassword
             Logger.Log("Silent mode: using credentials from configuration", Logger.LogLevel.Info)
         Else
+            ' Prefer whatever the user typed, but fall back to the saved
+            ' (DPAPI-encrypted) credentials from App.config — nobody should
+            ' have to retype credentials that ship with the deployment.
             user = txtSftpUsername.Text
             pass = txtSftpPassword.Text
+            If String.IsNullOrWhiteSpace(user) Then user = ConfigManager.SftpUsername
+            If String.IsNullOrWhiteSpace(pass) Then pass = ConfigManager.SftpPassword
         End If
 
         If String.IsNullOrWhiteSpace(user) OrElse String.IsNullOrWhiteSpace(pass) Then
@@ -359,14 +377,18 @@ Public Class MainForm
             If Not runSilently Then
                 Try
                     Me.Invoke(Sub()
-                                  SetStatus("Update complete", StatusKind.Success)
+                                  ' Keep the engine's final status text — it distinguishes a
+                                  ' verified install from a patch still running in the background
+                                  Dim finalText As String = lblStatus.Text
+                                  Dim stillInstalling As Boolean = finalText.StartsWith("Patch is", StringComparison.OrdinalIgnoreCase)
+                                  SetStatus(finalText, If(stillInstalling, StatusKind.Working, StatusKind.Success))
                                   lblPercent.Text = String.Empty
                                   lblProgressDetail.Text = String.Empty
                               End Sub)
                 Catch
                     ' Form may be disposed during exit
                 End Try
-                Logger.Log("Update completed in UI mode.", Logger.LogLevel.Info)
+                Logger.Log("Update run finished in UI mode.", Logger.LogLevel.Info)
             End If
 
         Catch ex As OperationCanceledException
