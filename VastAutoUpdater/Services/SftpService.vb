@@ -102,27 +102,41 @@ Public Class SftpService
     ''' </summary>
     Public Function GetLatestVersion(prefix As String) As String Implements ISftpService.GetLatestVersion
         EnsureConnected()
-        Dim files = client.ListDirectory(remoteDir).
-            Where(Function(f) f.IsRegularFile AndAlso f.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+        Dim names = client.ListDirectory(remoteDir).
+            Where(Function(f) f.IsRegularFile).
+            Select(Function(f) f.Name)
 
+        Dim latest As String = SelectLatestVersion(names, prefix)
+        If latest = "0.0.0" Then
+            Logger.Log($"No matching version found on SFTP for prefix: {prefix}", Logger.LogLevel.Warning)
+        Else
+            Logger.Log($"Latest version available for {prefix}: {latest}", Logger.LogLevel.Info)
+        End If
+        Return latest
+    End Function
+
+    ''' <summary>
+    ''' Pick the highest version among installer file names like "9.0.1653.exe"
+    ''' or "9.0.1653.1.exe" that match the given major.minor prefix.
+    ''' The returned string round-trips to the original file name (minus ".exe"),
+    ''' so it can be used directly to build the download path.
+    ''' Returns "0.0.0" when nothing matches. Pure and Shared for unit testing.
+    ''' </summary>
+    Public Shared Function SelectLatestVersion(fileNames As IEnumerable(Of String), prefix As String) As String
         Dim versions As New List(Of Version)()
-        For Each f In files
-            Dim name As String = Path.GetFileNameWithoutExtension(f.Name)
+        For Each fileName As String In fileNames
+            If Not fileName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) Then Continue For
+            Dim name As String = Path.GetFileNameWithoutExtension(fileName)
             Dim v As Version = Nothing
             If Version.TryParse(name, v) AndAlso $"{v.Major}.{v.Minor}" = prefix Then
                 versions.Add(v)
             End If
         Next
 
-        If versions.Count = 0 Then
-            Logger.Log($"No matching version found on SFTP for prefix: {prefix}", Logger.LogLevel.Warning)
-            Return "0.0.0"
-        End If
+        If versions.Count = 0 Then Return "0.0.0"
 
         versions.Sort()
-        Dim latest As String = versions.Last().ToString()
-        Logger.Log($"Latest version available for {prefix}: {latest}", Logger.LogLevel.Info)
-        Return latest
+        Return versions.Last().ToString()
     End Function
 
     ''' <summary>

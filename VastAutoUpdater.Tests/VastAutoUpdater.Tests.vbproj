@@ -68,6 +68,7 @@
     <Compile Include="Tests\UpdaterEngineTests.vb" />
     <Compile Include="Tests\EmailServiceTests.vb" />
     <Compile Include="Tests\DashboardServiceTests.vb" />
+    <Compile Include="Tests\SftpServiceTests.vb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VastAutoUpdater\VastAutoUpdater.vbproj">
