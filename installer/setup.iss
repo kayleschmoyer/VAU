@@ -31,8 +31,12 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription:
 Name: "scheduledtask"; Description: "Run silent update check daily at 2:00 AM"; GroupDescription: "Automated updates:"; Flags: checkedonce
 
 [Run]
-; Create the scheduled task if the user opted in
-Filename: "schtasks.exe"; Parameters: "/Create /TN ""VAST Auto Updater"" /TR """"""{app}\VastAutoUpdater.exe"" silent"" /SC DAILY /ST 02:00 /RL HIGHEST /F"; Flags: runhidden; Tasks: scheduledtask
+; Create the scheduled task if the user opted in.
+; /TR needs backslash-escaped quotes around the exe path so schtasks stores
+; Command="{app}\VastAutoUpdater.exe" with Arguments=silent — the previous
+; triple-quote form made schtasks reject the command ("Invalid argument
+; 'Files\VAST'") and the task was never created.
+Filename: "schtasks.exe"; Parameters: "/Create /TN ""VAST Auto Updater"" /TR ""\""{app}\VastAutoUpdater.exe\"" silent"" /SC DAILY /ST 02:00 /RL HIGHEST /F"; Flags: runhidden; Tasks: scheduledtask
 ; Offer to launch after install
 Filename: "{app}\VastAutoUpdater.exe"; Description: "Launch VAST Auto Updater"; Flags: nowait postinstall skipifsilent shellexec
 
