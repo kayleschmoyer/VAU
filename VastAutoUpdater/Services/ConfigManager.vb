@@ -77,17 +77,39 @@ Public Module ConfigManager
         End Get
     End Property
 
+    Private Shared _companyInfoLoaded As Boolean = False
+    Private Shared _cachedCustomerName As String = Nothing
+    Private Shared _cachedSiteName As String = Nothing
+
     Public ReadOnly Property CustomerName As String
         Get
-            Return GetSetting("CustomerName", "")
+            Dim configured As String = GetSetting("CustomerName", "")
+            If Not String.IsNullOrWhiteSpace(configured) Then Return configured
+            EnsureCompanyInfoLoaded()
+            Return If(_cachedCustomerName, String.Empty)
         End Get
     End Property
 
     Public ReadOnly Property SiteName As String
         Get
-            Return GetSetting("SiteName", "")
+            Dim configured As String = GetSetting("SiteName", "")
+            If Not String.IsNullOrWhiteSpace(configured) Then Return configured
+            EnsureCompanyInfoLoaded()
+            Return If(_cachedSiteName, String.Empty)
         End Get
     End Property
+
+    ''' <summary>
+    ''' Load company info from VastOffice database on first access.
+    ''' Uses NAME for CustomerName and COMPANY_NUMBER for SiteName.
+    ''' </summary>
+    Private Sub EnsureCompanyInfoLoaded()
+        If _companyInfoLoaded Then Return
+        _companyInfoLoaded = True
+        Dim info = CompanyLookupService.GetCompanyInfo()
+        _cachedCustomerName = info.Name
+        _cachedSiteName = info.CompanyNumber
+    End Sub
 
     ''' <summary>
     ''' Safely retrieve a string setting with a default fallback.
@@ -215,23 +237,4 @@ Public Module ConfigManager
         If String.IsNullOrWhiteSpace(SftpHost) Then missing.Add("SftpHost")
         If String.IsNullOrWhiteSpace(SftpUsername) Then missing.Add("SftpUsername")
         If String.IsNullOrWhiteSpace(SftpPassword) Then missing.Add("SftpPassword")
-        If String.IsNullOrWhiteSpace(SmtpHost) Then missing.Add("SmtpHost")
-        If String.IsNullOrWhiteSpace(SmtpUsername) Then missing.Add("SmtpUsername")
-        If String.IsNullOrWhiteSpace(SmtpPassword) Then missing.Add("SmtpPassword")
-        If String.IsNullOrWhiteSpace(EmailFrom) Then missing.Add("EmailFrom")
-        If String.IsNullOrWhiteSpace(EmailTo) Then missing.Add("EmailTo")
-
-        If missing.Count > 0 Then
-            Logger.Log($"Configuration incomplete — missing: {String.Join(", ", missing)}", Logger.LogLevel.Warning)
-        Else
-            Logger.Log("All configuration values present", Logger.LogLevel.Info)
-        End If
-
-        ' SFTP config is the minimum required to perform an update check
-        Dim sftpReady As Boolean = Not String.IsNullOrWhiteSpace(SftpHost) AndAlso
-                                   Not String.IsNullOrWhiteSpace(SftpUsername) AndAlso
-                                   Not String.IsNullOrWhiteSpace(SftpPassword)
-        Return sftpReady
-    End Function
-
-End Module
+        If String.IsNullOrWhiteS

@@ -202,6 +202,7 @@
     <Compile Include="UI\SettingsForm.vb" />
     <Compile Include="Services\Logger.vb" />
     <Compile Include="Services\ConfigManager.vb" />
+    <Compile Include="Services\CompanyLookupService.vb" />
     <Compile Include="Services\ISftpService.vb" />
     <Compile Include="Services\IEmailService.vb" />
     <Compile Include="Services\IDashboardService.vb" />
@@ -276,6 +277,4 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets'))" />
-  </Target>
-</Project>
+    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net4
