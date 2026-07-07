@@ -72,8 +72,9 @@ Public Class MainForm
         ' Custom progress bar color
         SetProgressBarColor()
 
-        ' Button handler
+        ' Button handlers
         AddHandler btnCheckForUpdates.Click, AddressOf BtnCheckForUpdates_Click
+        AddHandler btnSettings.Click, AddressOf BtnSettings_Click
     End Sub
 
     ''' <summary>
@@ -132,6 +133,15 @@ Public Class MainForm
     ''' </summary>
     Private Sub BtnMinimize_Click(sender As Object, e As EventArgs)
         Me.WindowState = FormWindowState.Minimized
+    End Sub
+
+    ''' <summary>
+    ''' Open the settings dialog for configuring email recipients.
+    ''' </summary>
+    Private Sub BtnSettings_Click(sender As Object, e As EventArgs)
+        Using settingsForm As New SettingsForm()
+            settingsForm.ShowDialog(Me)
+        End Using
     End Sub
 
     ' -- Progress bar color hack --
@@ -347,4 +357,7 @@ Public Class MainForm
         If exitCode <> 0 Then
             Environment.ExitCode = exitCode
         End If
-        App
+        Application.Exit()
+    End Sub
+
+End Class
