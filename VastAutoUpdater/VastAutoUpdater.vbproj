@@ -199,13 +199,25 @@
       <DependentUpon>MainForm.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\SettingsForm.vb" />
+    <Compile Include="UI\SettingsForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\Controls\UiTheme.vb" />
-    <Compile Include="UI\Controls\CardPanel.vb" />
-    <Compile Include="UI\Controls\RoundedButton.vb" />
-    <Compile Include="UI\Controls\SmoothProgressBar.vb" />
-    <Compile Include="UI\Controls\ModernTextBox.vb" />
-    <Compile Include="UI\Controls\PillBadge.vb" />
+    <Compile Include="UI\Controls\CardPanel.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Controls\RoundedButton.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Controls\SmoothProgressBar.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Controls\ModernTextBox.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\Controls\PillBadge.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Services\Logger.vb" />
     <Compile Include="Services\ConfigManager.vb" />
     <Compile Include="Services\CompanyLookupService.vb" />
@@ -220,7 +232,6 @@
     <Compile Include="Services\UpdaterEngine.vb" />
     <Compile Include="Services\VersionService.vb" />
     <Compile Include="Services\InstallerPathService.vb" />
-
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
