@@ -48,9 +48,35 @@ jobs:
       run: msbuild VastAutoUpdater.sln /p:Configuration=Release /p:Platform="Any CPU" /t:Rebuild /verbosity:minimal
 
     - name: Run Tests
-      uses: microsoft/vstest-action@v1.0.0
-      with:
-        testAssembly: VastAutoUpdater.Tests\bin\Release\VastAutoUpdater.Tests.dll
+      shell: pwsh
+      run: |
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $vstest = & $vswhere -latest -products * -requires Microsoft.VisualStudio.PackageGroup.TestTools.Core -find Common7\IDE\Extensions\TestPlatform\vstest.console.exe
+        if (-not $vstest) {
+          Write-Error "vstest.console.exe not found via vswhere"
+          exit 1
+        }
+        & $vstest VastAutoUpdater.Tests\bin\Release\VastAutoUpdater.Tests.dll /TestAdapterPath:packages\MSTest.TestAdapter.3.1.1\build /Logger:trx
+        exit $LASTEXITCODE
+
+    - name: Build installer
+      shell: pwsh
+      run: |
+        $version = "${{ steps.version.outputs.VERSION }}"
+        $issPath = "installer\setup.iss"
+        $content = Get-Content $issPath -Raw
+        $content = $content -replace 'AppVersion=[^\r\n]*', "AppVersion=$version"
+        Set-Content $issPath $content -NoNewline
+        $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+        if (-not (Test-Path $iscc)) {
+          choco install innosetup -y --no-progress
+        }
+        if (-not (Test-Path $iscc)) {
+          Write-Error "ISCC.exe not found after install"
+          exit 1
+        }
+        & $iscc $issPath
+        exit $LASTEXITCODE
 
     - name: Prepare release artifacts
       shell: pwsh
@@ -60,9 +86,12 @@ jobs:
         Copy-Item "VastAutoUpdater\bin\Release\VastAutoUpdater.exe" "$outDir\"
         Copy-Item "VastAutoUpdater\bin\Release\VastAutoUpdater.exe.config" "$outDir\"
         Copy-Item "VastAutoUpdater\bin\Release\*.dll" "$outDir\"
-        # Generate SHA-256 hash for the executable
+        Copy-Item "installer\Output\VastAutoUpdater-Setup.exe" "$outDir\"
+        # Generate SHA-256 hashes for the executables
         $hash = Get-FileHash "$outDir\VastAutoUpdater.exe" -Algorithm SHA256
         "$($hash.Hash)  VastAutoUpdater.exe" | Out-File "$outDir\VastAutoUpdater.exe.sha256" -Encoding utf8
+        $setupHash = Get-FileHash "$outDir\VastAutoUpdater-Setup.exe" -Algorithm SHA256
+        "$($setupHash.Hash)  VastAutoUpdater-Setup.exe" | Out-File "$outDir\VastAutoUpdater-Setup.exe.sha256" -Encoding utf8
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
@@ -72,15 +101,18 @@ jobs:
           ## VAST Auto Updater v${{ steps.version.outputs.VERSION }}
 
           ### Artifacts
+          - `VastAutoUpdater-Setup.exe` — Installer (recommended)
           - `VastAutoUpdater.exe` — Main updater executable
-          - `VastAutoUpdater.exe.sha256` — SHA-256 hash for integrity verification
+          - `*.sha256` — SHA-256 hashes for integrity verification
 
           ### Verification
           ```powershell
-          (Get-FileHash VastAutoUpdater.exe -Algorithm SHA256).Hash
+          (Get-FileHash VastAutoUpdater-Setup.exe -Algorithm SHA256).Hash
           ```
-          Compare with the hash in `VastAutoUpdater.exe.sha256`.
+          Compare with the hash in the matching `.sha256` file.
         files: |
+          release-artifacts/VastAutoUpdater-Setup.exe
+          release-artifacts/VastAutoUpdater-Setup.exe.sha256
           release-artifacts/VastAutoUpdater.exe
           release-artifacts/VastAutoUpdater.exe.config
           release-artifacts/VastAutoUpdater.exe.sha256
