@@ -246,10 +246,13 @@ Public Module ConfigManager
         If String.IsNullOrWhiteSpace(SmtpHost) Then missing.Add("SmtpHost")
         If String.IsNullOrWhiteSpace(SmtpUsername) Then missing.Add("SmtpUsername")
         If String.IsNullOrWhiteSpace(SmtpPassword) Then missing.Add("SmtpPassword")
+        If String.IsNullOrWhiteSpace(EmailFrom) Then missing.Add("EmailFrom")
         If String.IsNullOrWhiteSpace(EmailTo) Then missing.Add("EmailTo")
 
         If missing.Count > 0 Then
-            Logger.Log($"Missing or empty configuration values: {String.Join(", ", missing)}", Logger.LogLevel.Warning)
+            Logger.Log($"Configuration incomplete — missing: {String.Join(", ", missing)}", Logger.LogLevel.Warning)
+        Else
+            Logger.Log("All configuration values present", Logger.LogLevel.Info)
         End If
 
         ' SFTP settings are the minimum required to run an update check
