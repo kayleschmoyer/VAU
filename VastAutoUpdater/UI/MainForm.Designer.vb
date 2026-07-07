@@ -23,26 +23,26 @@ Partial Class MainForm
     Private WithEvents btnSettings As System.Windows.Forms.Button
 
     ' Credential card
-    Private WithEvents cardCredentials As CardPanel
+    Private WithEvents cardCredentials As Global.VastAutoUpdater.CardPanel
     Private WithEvents lblUsername As System.Windows.Forms.Label
-    Private WithEvents txtSftpUsername As ModernTextBox
+    Private WithEvents txtSftpUsername As Global.VastAutoUpdater.ModernTextBox
     Private WithEvents lblPassword As System.Windows.Forms.Label
-    Private WithEvents txtSftpPassword As ModernTextBox
+    Private WithEvents txtSftpPassword As Global.VastAutoUpdater.ModernTextBox
 
     ' Action
-    Private WithEvents btnCheckForUpdates As RoundedButton
+    Private WithEvents btnCheckForUpdates As Global.VastAutoUpdater.RoundedButton
 
     ' Activity card (status + progress)
-    Private WithEvents cardActivity As CardPanel
+    Private WithEvents cardActivity As Global.VastAutoUpdater.CardPanel
     Private WithEvents lblStatusIcon As System.Windows.Forms.Label
     Private WithEvents lblStatus As System.Windows.Forms.Label
     Private WithEvents lblPercent As System.Windows.Forms.Label
-    Private WithEvents progressBar1 As SmoothProgressBar
+    Private WithEvents progressBar1 As Global.VastAutoUpdater.SmoothProgressBar
     Private WithEvents lblProgressDetail As System.Windows.Forms.Label
 
     ' Footer row
     Private WithEvents lblCurrentVersion As System.Windows.Forms.Label
-    Private WithEvents badgeUpdate As PillBadge
+    Private WithEvents badgeUpdate As Global.VastAutoUpdater.PillBadge
     Private WithEvents pnlFooter As System.Windows.Forms.Panel
 
     <System.Diagnostics.DebuggerStepThrough()>
@@ -53,20 +53,20 @@ Partial Class MainForm
         Me.btnClose = New System.Windows.Forms.Button()
         Me.btnMinimize = New System.Windows.Forms.Button()
         Me.btnSettings = New System.Windows.Forms.Button()
-        Me.cardCredentials = New CardPanel()
+        Me.cardCredentials = New Global.VastAutoUpdater.CardPanel()
         Me.lblUsername = New System.Windows.Forms.Label()
-        Me.txtSftpUsername = New ModernTextBox()
+        Me.txtSftpUsername = New Global.VastAutoUpdater.ModernTextBox()
         Me.lblPassword = New System.Windows.Forms.Label()
-        Me.txtSftpPassword = New ModernTextBox()
-        Me.btnCheckForUpdates = New RoundedButton()
-        Me.cardActivity = New CardPanel()
+        Me.txtSftpPassword = New Global.VastAutoUpdater.ModernTextBox()
+        Me.btnCheckForUpdates = New Global.VastAutoUpdater.RoundedButton()
+        Me.cardActivity = New Global.VastAutoUpdater.CardPanel()
         Me.lblStatusIcon = New System.Windows.Forms.Label()
         Me.lblStatus = New System.Windows.Forms.Label()
         Me.lblPercent = New System.Windows.Forms.Label()
-        Me.progressBar1 = New SmoothProgressBar()
+        Me.progressBar1 = New Global.VastAutoUpdater.SmoothProgressBar()
         Me.lblProgressDetail = New System.Windows.Forms.Label()
         Me.lblCurrentVersion = New System.Windows.Forms.Label()
-        Me.badgeUpdate = New PillBadge()
+        Me.badgeUpdate = New Global.VastAutoUpdater.PillBadge()
         Me.pnlFooter = New System.Windows.Forms.Panel()
         Me.pnlHeader.SuspendLayout()
         Me.cardCredentials.SuspendLayout()
