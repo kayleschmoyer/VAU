@@ -37,9 +37,17 @@ Public Class DashboardService
                 Return
             End If
 
+            ' The API rejects empty customer/site (400). Machines that haven't
+            ' been configured yet must still report in — they're the ones most
+            ' likely to need attention — so fall back to an attributable identity.
+            Dim customer As String = ConfigManager.CustomerName
+            If String.IsNullOrWhiteSpace(customer) Then customer = "Unknown"
+            Dim site As String = ConfigManager.SiteName
+            If String.IsNullOrWhiteSpace(site) Then site = Environment.MachineName
+
             Dim payload As String = BuildPayload(
-                ConfigManager.CustomerName,
-                ConfigManager.SiteName,
+                customer,
+                site,
                 Environment.MachineName,
                 GetMachineKey(),
                 EventTypeName(eventType),
