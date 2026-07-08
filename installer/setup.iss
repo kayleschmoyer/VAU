@@ -1,6 +1,6 @@
 [Setup]
 AppName=VAST Auto Updater
-AppVersion=1.1.2
+AppVersion=1.1.3
 AppPublisher=VAST Retail
 AppSupportURL=https://github.com/kayleschmoyer/VAU
 AppUpdatesURL=https://github.com/kayleschmoyer/VAU/releases
@@ -28,7 +28,16 @@ Name: "{autodesktop}\VAST Auto Updater"; Filename: "{app}\VastAutoUpdater.exe"; 
 
 [Tasks]
 Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"
-Name: "scheduledtask"; Description: "Run silent update check daily at 2:00 AM"; GroupDescription: "Automated updates:"; Flags: checkedonce
+Name: "scheduledtask"; Description: "Run silent update check weekly on Sunday at 2:00 AM"; GroupDescription: "Automated updates:"; Flags: checkedonce
+
+[Dirs]
+; Pre-create the ProgramData folders with Users:Modify so that any account
+; (SYSTEM task, admin, or standard user) can write logs and downloads.
+; Without this, whichever account creates the folder first owns it and
+; other accounts get "Access denied" on the installer file.
+Name: "{commonappdata}\VASTUpdater"; Permissions: users-modify
+Name: "{commonappdata}\VASTUpdater\Logs"; Permissions: users-modify
+Name: "{commonappdata}\VASTUpdater\NewPatchInstall"; Permissions: users-modify
 
 [Run]
 ; Create the scheduled task if the user opted in.
@@ -38,7 +47,7 @@ Name: "scheduledtask"; Description: "Run silent update check daily at 2:00 AM"; 
 ; 'Files\VAST'") and the task was never created.
 ; /RU SYSTEM makes the task run whether or not anyone is logged on (the app
 ; is fully headless in silent mode and all its paths are machine-scoped).
-Filename: "schtasks.exe"; Parameters: "/Create /TN ""VAST Auto Updater"" /TR ""\""{app}\VastAutoUpdater.exe\"" silent"" /SC DAILY /ST 02:00 /RU SYSTEM /RL HIGHEST /F"; Flags: runhidden; Tasks: scheduledtask
+Filename: "schtasks.exe"; Parameters: "/Create /TN ""VAST Auto Updater"" /TR ""\""{app}\VastAutoUpdater.exe\"" silent"" /SC WEEKLY /D SUN /ST 02:00 /RU SYSTEM /RL HIGHEST /F"; Flags: runhidden; Tasks: scheduledtask
 ; Offer to launch after install
 Filename: "{app}\VastAutoUpdater.exe"; Description: "Launch VAST Auto Updater"; Flags: nowait postinstall skipifsilent shellexec
 

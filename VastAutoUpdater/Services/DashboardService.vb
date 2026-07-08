@@ -176,22 +176,27 @@ Public Class DashboardService
     End Function
 
     ''' <summary>
-    ''' Read the Windows machine GUID from the registry to uniquely identify
-    ''' this machine. Returns an empty string if unavailable.
+    ''' Uniquely identify this machine: Windows machine GUID combined with the
+    ''' computer name. Cloned VMs share a machine GUID and machines behind the
+    ''' same NAT share an external IP, so neither is unique on its own — the
+    ''' GUID:hostname composite keeps every box distinct on the dashboard.
     ''' </summary>
     Public Shared Function GetMachineKey() As String
+        Dim guid As String = String.Empty
         Try
             Using baseKey As RegistryKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64)
                 Using cryptoKey As RegistryKey = baseKey.OpenSubKey("SOFTWARE\Microsoft\Cryptography")
                     If cryptoKey IsNot Nothing Then
-                        Return CStr(cryptoKey.GetValue("MachineGuid", String.Empty))
+                        guid = CStr(cryptoKey.GetValue("MachineGuid", String.Empty))
                     End If
                 End Using
             End Using
         Catch ex As Exception
             Logger.Log($"Could not read machine GUID: {ex.Message}", Logger.LogLevel.Warning)
         End Try
-        Return String.Empty
+
+        If String.IsNullOrEmpty(guid) Then Return Environment.MachineName
+        Return $"{guid}:{Environment.MachineName}"
     End Function
 
 End Class

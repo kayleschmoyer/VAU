@@ -1,4 +1,6 @@
 Imports System.IO
+Imports System.Security.AccessControl
+Imports System.Security.Principal
 Imports System.Text.RegularExpressions
 
 ''' <summary>
@@ -11,13 +13,39 @@ Public Module InstallerPathService
         "VASTUpdater", "NewPatchInstall")
 
     ''' <summary>
-    ''' Ensure the update folder exists in ProgramData.
+    ''' Ensure the update folder exists in ProgramData, writable by all users.
+    ''' Whichever account creates a ProgramData folder first owns it; without
+    ''' an explicit grant, other accounts (SYSTEM task vs. interactive user)
+    ''' get "Access denied" replacing each other's downloaded installers.
     ''' </summary>
     Public Sub EnsureUpdateFolderExists()
         If Not Directory.Exists(BasePath) Then
             Directory.CreateDirectory(BasePath)
+            GrantUsersModify(BasePath)
             Logger.Log($"Created update folder: {BasePath}", Logger.LogLevel.Info)
         End If
+    End Sub
+
+    ''' <summary>
+    ''' Best-effort grant of Modify to BUILTIN\Users on a folder (inherited by
+    ''' its files). Failures are logged, never fatal — the installer also sets
+    ''' these ACLs at install time.
+    ''' </summary>
+    Private Sub GrantUsersModify(folderPath As String)
+        Try
+            Dim dirInfo As New DirectoryInfo(folderPath)
+            Dim security As DirectorySecurity = dirInfo.GetAccessControl()
+            Dim usersSid As New SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, Nothing)
+            security.AddAccessRule(New FileSystemAccessRule(
+                usersSid,
+                FileSystemRights.Modify Or FileSystemRights.Synchronize,
+                InheritanceFlags.ContainerInherit Or InheritanceFlags.ObjectInherit,
+                PropagationFlags.None,
+                AccessControlType.Allow))
+            dirInfo.SetAccessControl(security)
+        Catch ex As Exception
+            Logger.Log($"Could not grant Users write access on '{folderPath}': {ex.Message}", Logger.LogLevel.Warning)
+        End Try
     End Sub
 
     ''' <summary>
